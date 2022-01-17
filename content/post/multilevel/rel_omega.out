@@ -1,0 +1,472 @@
+Mplus VERSION 8.3 (Mac)
+MUTHEN & MUTHEN
+05/21/2019  10:59 AM
+
+INPUT INSTRUCTIONS
+
+  TITLE:
+  MCFA RELIABILITY EXAMPLE
+  DATA:
+  FILE = "./multilevel/rel_omega_dd5537190d5a9ed7c1265aa4b4c7c7be.dat";
+
+  VARIABLE:
+  NAMES = item1 item2 item3 item4 id time;
+   MISSING=.;
+   CLUSTER = id;
+   WITHIN = time;
+  ANALYSIS:
+  TYPE = TWOLEVEL
+  MODEL:
+  %WITHIN%
+  ite_w BY item1* (wl1)
+  item2 (wl2)
+  item3 (wl3)
+  item4 (wl4);ite_w@1;
+
+  item1 (wr1);
+  item2 (wr2);
+  item3 (wr3);
+  item4 (wr4);
+  item1 item2 item3 item4  ON time ;
+  %BETWEEN%
+  ite_b BY item1* (bl1)
+  item2 (bl2)
+  item3 (bl3)
+  item4 (bl4);ite_b@1;
+
+  item1 (br1);
+  item2 (br2);
+  item3 (br3);
+  item4 (br4);
+  MODEL CONSTRAINT:
+  NEW (num_w denom_w omega_w h_w num_b denom_b omega_b h_b);
+  num_w = (wl1+wl2+wl3+wl4)**2;
+  denom_w = ((wl1+wl2+wl3+wl4)**2)+(wr1+wr2+wr3+wr4);
+  omega_w = num_w/denom_w;
+  h_w = 1/(1+(1/((wl1**2/wr1)+(wl2**2/wr2)+(wl3**2/wr3)+(wl4**2/wr4))));
+  num_b = (bl1+bl2+bl3+bl4)**2;
+  denom_b = ((bl1+bl2+bl3+bl4)**2)+(br1+br2+br3+br4);
+  omega_b = num_b/denom_b;
+  h_b = 1/(1+(1/((bl1**2/br1)+(bl2**2/br2)+(bl3**2/br3)+(bl4**2/br4))));
+  wr1 > 0;
+  wr2 > 0;
+  wr3 > 0;
+  wr4 > 0;
+  br1 > 0;
+  br2 > 0;
+  br3 > 0;
+  br4 > 0;
+
+  OUTPUT:
+  SAMPSTAT CINTERVAL;
+
+
+
+*** WARNING
+  One or more individual-level variables have no variation within a
+  cluster for the following clusters.
+
+     Variable   Cluster IDs with no within-cluster variation
+
+      ITEM2       409 501 431
+      ITEM3       463 451 351
+      ITEM4       423 471 447 451 351
+
+*** WARNING
+  Data set contains cases with missing on all variables except
+  x-variables.  These cases were not included in the analysis.
+  Number of cases with missing on all variables except x-variables:  45
+   2 WARNING(S) FOUND IN THE INPUT INSTRUCTIONS
+
+
+
+
+MCFA RELIABILITY EXAMPLE
+
+SUMMARY OF ANALYSIS
+
+Number of groups                                                 1
+Number of observations                                         454
+
+Number of dependent variables                                    4
+Number of independent variables                                  1
+Number of continuous latent variables                            2
+
+Observed dependent variables
+
+  Continuous
+   ITEM1       ITEM2       ITEM3       ITEM4
+
+Observed independent variables
+   TIME
+
+Continuous latent variables
+   ITE_W       ITE_B
+
+Variables with special functions
+
+  Cluster variable      ID
+
+  Within variables
+   TIME
+
+
+Estimator                                                      MLR
+Information matrix                                        OBSERVED
+Maximum number of iterations                                   100
+Convergence criterion                                    0.100D-05
+Maximum number of EM iterations                                500
+Convergence criteria for the EM algorithm
+  Loglikelihood change                                   0.100D-02
+  Relative loglikelihood change                          0.100D-05
+  Derivative                                             0.100D-03
+Minimum variance                                         0.100D-03
+Maximum number of steepest descent iterations                   20
+Maximum number of iterations for H1                           2000
+Convergence criterion for H1                             0.100D-03
+Optimization algorithm                                         EMA
+
+Input data file(s)
+  ./multilevel/rel_omega_dd5537190d5a9ed7c1265aa4b4c7c7be.dat
+Input data format  FREE
+
+
+SUMMARY OF DATA
+
+     Number of missing data patterns             6
+     Number of clusters                         50
+
+     Average cluster size        9.080
+
+     Estimated Intraclass Correlations for the Y Variables
+
+                Intraclass              Intraclass              Intraclass
+     Variable  Correlation   Variable  Correlation   Variable  Correlation
+
+     ITEM1        0.471      ITEM2        0.540      ITEM3        0.457
+     ITEM4        0.491
+
+
+
+COVARIANCE COVERAGE OF DATA
+
+Minimum covariance coverage value   0.100
+
+
+     PROPORTION OF DATA PRESENT
+
+
+           Covariance Coverage
+              ITEM1         ITEM2         ITEM3         ITEM4         TIME
+              ________      ________      ________      ________      ________
+ ITEM1          0.989
+ ITEM2          0.987         0.996
+ ITEM3          0.974         0.982         0.982
+ ITEM4          0.982         0.989         0.976         0.993
+ TIME           0.989         0.996         0.982         0.993         1.000
+
+
+SAMPLE STATISTICS
+
+NOTE:  The sample statistics for within and between refer to the
+       maximum-likelihood estimated within and between covariance
+       matrices, respectively.
+
+
+     ESTIMATED SAMPLE STATISTICS FOR WITHIN
+
+
+           Means
+              ITEM1         ITEM2         ITEM3         ITEM4         TIME
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         5.467
+
+
+           Covariances
+              ITEM1         ITEM2         ITEM3         ITEM4         TIME
+              ________      ________      ________      ________      ________
+ ITEM1          0.502
+ ITEM2          0.217         0.579
+ ITEM3          0.288         0.277         0.609
+ ITEM4          0.229         0.243         0.284         0.542
+ TIME          -0.229        -0.072        -0.309         0.177         8.205
+
+
+           Correlations
+              ITEM1         ITEM2         ITEM3         ITEM4         TIME
+              ________      ________      ________      ________      ________
+ ITEM1          1.000
+ ITEM2          0.402         1.000
+ ITEM3          0.522         0.466         1.000
+ ITEM4          0.440         0.434         0.494         1.000
+ TIME          -0.113        -0.033        -0.138         0.084         1.000
+
+
+     ESTIMATED SAMPLE STATISTICS FOR BETWEEN
+
+
+           Means
+              ITEM1         ITEM2         ITEM3         ITEM4         TIME
+              ________      ________      ________      ________      ________
+                2.429         2.765         2.271         2.270         0.000
+
+
+           Covariances
+              ITEM1         ITEM2         ITEM3         ITEM4         TIME
+              ________      ________      ________      ________      ________
+ ITEM1          0.446
+ ITEM2          0.355         0.682
+ ITEM3          0.387         0.436         0.512
+ ITEM4          0.299         0.318         0.332         0.522
+ TIME           0.000         0.000         0.000         0.000         0.000
+
+
+           Correlations
+              ITEM1         ITEM2         ITEM3         ITEM4         TIME
+              ________      ________      ________      ________      ________
+ ITEM1          1.000
+ ITEM2          0.643         1.000
+ ITEM3          0.809         0.739         1.000
+ ITEM4          0.620         0.534         0.642         1.000
+ TIME           0.000         0.000         0.000         0.000         0.000
+
+
+     MAXIMUM LOG-LIKELIHOOD VALUE FOR THE UNRESTRICTED (H1) MODEL IS -1983.804
+
+
+UNIVARIATE SAMPLE STATISTICS
+
+
+     UNIVARIATE HIGHER-ORDER MOMENT DESCRIPTIVE STATISTICS
+
+         Variable/         Mean/     Skewness/   Minimum/ % with                Percentiles
+        Sample Size      Variance    Kurtosis    Maximum  Min/Max      20%/60%    40%/80%    Median
+
+     ITEM1                 2.441       0.203       1.000   18.49%       2.000      2.000      2.000
+             449.000       0.946      -0.531       5.000    1.56%       3.000      3.000
+     ITEM2                 2.777       0.028       1.000   16.59%       2.000      3.000      3.000
+             452.000       1.289      -0.743       5.000    6.42%       3.000      4.000
+     ITEM3                 2.265       0.380       1.000   30.04%       1.000      2.000      2.000
+             446.000       1.127      -0.738       5.000    1.79%       3.000      3.000
+     ITEM4                 2.295       0.334       1.000   27.49%       1.000      2.000      2.000
+             451.000       1.073      -0.669       5.000    1.77%       3.000      3.000
+     TIME                  5.467       0.005       1.000   10.35%       2.000      4.000      5.500
+             454.000       8.205      -1.217      10.000    9.69%       6.000      8.000
+
+
+THE MODEL ESTIMATION TERMINATED NORMALLY
+
+
+
+MODEL FIT INFORMATION
+
+Number of Free Parameters                       24
+
+Loglikelihood
+
+          H0 Value                       -1984.355
+          H0 Scaling Correction Factor      1.5225
+            for MLR
+          H1 Value                       -1983.804
+          H1 Scaling Correction Factor      1.5331
+            for MLR
+
+Information Criteria
+
+          Akaike (AIC)                    4016.711
+          Bayesian (BIC)                  4115.545
+          Sample-Size Adjusted BIC        4039.377
+            (n* = (n + 2) / 24)
+
+Chi-Square Test of Model Fit
+
+          Value                              0.690*
+          Degrees of Freedom                     4
+          P-Value                           0.9525
+          Scaling Correction Factor         1.5971
+            for MLR
+
+*   The chi-square value for MLM, MLMV, MLR, ULSMV, WLSM and WLSMV cannot be used
+    for chi-square difference testing in the regular way.  MLM, MLR and WLSM
+    chi-square difference testing is described on the Mplus website.  MLMV, WLSMV,
+    and ULSMV difference testing is done using the DIFFTEST option.
+
+RMSEA (Root Mean Square Error Of Approximation)
+
+          Estimate                           0.000
+
+CFI/TLI
+
+          CFI                                1.000
+          TLI                                1.047
+
+Chi-Square Test of Model Fit for the Baseline Model
+
+          Value                            299.253
+          Degrees of Freedom                    16
+          P-Value                           0.0000
+
+SRMR (Standardized Root Mean Square Residual)
+
+          Value for Within                   0.006
+          Value for Between                  0.010
+
+
+
+MODEL RESULTS
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+Within Level
+
+ ITE_W    BY
+    ITEM1              0.469      0.039     12.001      0.000
+    ITEM2              0.471      0.051      9.173      0.000
+    ITEM3              0.586      0.044     13.200      0.000
+    ITEM4              0.503      0.049     10.318      0.000
+
+ ITEM1      ON
+    TIME              -0.028      0.016     -1.683      0.092
+
+ ITEM2      ON
+    TIME              -0.009      0.020     -0.440      0.660
+
+ ITEM3      ON
+    TIME              -0.037      0.020     -1.888      0.059
+
+ ITEM4      ON
+    TIME               0.021      0.018      1.198      0.231
+
+ Variances
+    ITE_W              1.000      0.000    999.000    999.000
+
+ Residual Variances
+    ITEM1              0.275      0.030      9.315      0.000
+    ITEM2              0.357      0.051      6.977      0.000
+    ITEM3              0.254      0.032      7.981      0.000
+    ITEM4              0.286      0.034      8.399      0.000
+
+Between Level
+
+ ITE_B    BY
+    ITEM1              0.572      0.082      6.971      0.000
+    ITEM2              0.637      0.092      6.931      0.000
+    ITEM3              0.676      0.084      8.092      0.000
+    ITEM4              0.500      0.102      4.891      0.000
+
+ Intercepts
+    ITEM1              2.581      0.128     20.115      0.000
+    ITEM2              2.813      0.157     17.894      0.000
+    ITEM3              2.473      0.136     18.191      0.000
+    ITEM4              2.153      0.143     15.108      0.000
+
+ Variances
+    ITE_B              1.000      0.000    999.000    999.000
+
+ Residual Variances
+    ITEM1              0.118      0.060      1.973      0.049
+    ITEM2              0.275      0.089      3.083      0.002
+    ITEM3              0.055      0.049      1.106      0.269
+    ITEM4              0.273      0.110      2.486      0.013
+
+New/Additional Parameters
+    NUM_W              4.116      0.463      8.883      0.000
+    DENOM_W            5.289      0.475     11.127      0.000
+    OMEGA_W            0.778      0.023     34.119      0.000
+    H_W                0.785      0.021     37.388      0.000
+    NUM_B              5.689      1.264      4.501      0.000
+    DENOM_B            6.411      1.223      5.243      0.000
+    OMEGA_B            0.887      0.036     24.482      0.000
+    H_B                0.931      0.043     21.576      0.000
+
+
+QUALITY OF NUMERICAL RESULTS
+
+     Condition Number for the Information Matrix              0.132E-04
+       (ratio of smallest to largest eigenvalue)
+
+
+CONFIDENCE INTERVALS OF MODEL RESULTS
+
+                  Lower .5%  Lower 2.5%    Lower 5%    Estimate    Upper 5%  Upper 2.5%   Upper .5%
+
+Within Level
+
+ ITE_W    BY
+    ITEM1            0.369       0.393       0.405       0.469       0.534       0.546       0.570
+    ITEM2            0.339       0.370       0.386       0.471       0.555       0.571       0.603
+    ITEM3            0.471       0.499       0.513       0.586       0.659       0.673       0.700
+    ITEM4            0.377       0.407       0.423       0.503       0.583       0.598       0.628
+
+ ITEM1    ON
+    TIME            -0.070      -0.060      -0.055      -0.028      -0.001       0.005       0.015
+
+ ITEM2    ON
+    TIME            -0.060      -0.048      -0.042      -0.009       0.024       0.030       0.043
+
+ ITEM3    ON
+    TIME            -0.088      -0.076      -0.069      -0.037      -0.005       0.001       0.013
+
+ ITEM4    ON
+    TIME            -0.025      -0.014      -0.008       0.021       0.051       0.056       0.067
+
+ Variances
+    ITE_W            1.000       1.000       1.000       1.000       1.000       1.000       1.000
+
+ Residual Variances
+    ITEM1            0.199       0.217       0.227       0.275       0.324       0.333       0.351
+    ITEM2            0.225       0.257       0.273       0.357       0.442       0.458       0.489
+    ITEM3            0.172       0.192       0.202       0.254       0.307       0.317       0.337
+    ITEM4            0.198       0.219       0.230       0.286       0.342       0.352       0.373
+
+Between Level
+
+ ITE_B    BY
+    ITEM1            0.361       0.411       0.437       0.572       0.707       0.733       0.783
+    ITEM2            0.400       0.457       0.486       0.637       0.788       0.817       0.874
+    ITEM3            0.461       0.513       0.539       0.676       0.814       0.840       0.892
+    ITEM4            0.236       0.299       0.332       0.500       0.668       0.700       0.763
+
+ Intercepts
+    ITEM1            2.251       2.330       2.370       2.581       2.792       2.833       2.912
+    ITEM2            2.408       2.505       2.554       2.813       3.072       3.121       3.218
+    ITEM3            2.123       2.207       2.250       2.473       2.697       2.740       2.824
+    ITEM4            1.786       1.874       1.919       2.153       2.388       2.433       2.520
+
+ Variances
+    ITE_B            1.000       1.000       1.000       1.000       1.000       1.000       1.000
+
+ Residual Variances
+    ITEM1           -0.036       0.001       0.020       0.118       0.217       0.236       0.273
+    ITEM2            0.045       0.100       0.128       0.275       0.422       0.451       0.506
+    ITEM3           -0.073      -0.042      -0.027       0.055       0.136       0.152       0.182
+    ITEM4           -0.010       0.058       0.092       0.273       0.454       0.488       0.556
+
+New/Additional Parameters
+    NUM_W            2.922       3.208       3.354       4.116       4.878       5.024       5.309
+    DENOM_W          4.064       4.357       4.507       5.289       6.070       6.220       6.513
+    OMEGA_W          0.720       0.734       0.741       0.778       0.816       0.823       0.837
+    H_W              0.731       0.744       0.751       0.785       0.820       0.826       0.839
+    NUM_B            2.434       3.212       3.610       5.689       7.768       8.166       8.944
+    DENOM_B          3.261       4.014       4.399       6.411       8.422       8.807       9.560
+    OMEGA_B          0.794       0.816       0.828       0.887       0.947       0.958       0.981
+    H_B              0.820       0.847       0.860       0.931       1.002       1.016       1.042
+
+
+     Beginning Time:  10:59:05
+        Ending Time:  10:59:06
+       Elapsed Time:  00:00:01
+
+
+
+MUTHEN & MUTHEN
+3463 Stoner Ave.
+Los Angeles, CA  90066
+
+Tel: (310) 391-9971
+Fax: (310) 391-8971
+Web: www.StatModel.com
+Support: Support@StatModel.com
+
+Copyright (c) 1998-2019 Muthen & Muthen

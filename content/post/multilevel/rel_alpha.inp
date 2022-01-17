@@ -1,0 +1,52 @@
+TITLE:
+MCFA RELIABILITY EXAMPLE
+DATA:
+FILE = "./multilevel/rel_omega_dd5537190d5a9ed7c1265aa4b4c7c7be.dat";
+ 
+VARIABLE:
+NAMES = item1 item2 item3 item4 id time; 
+ MISSING=.;
+ CLUSTER = id; 
+ WITHIN = time;
+ANALYSIS:
+TYPE = TWOLEVEL
+MODEL:
+%WITHIN%
+item1 WITH
+item2 (wc1)
+item3 (wc2)
+item4 (wc3);
+item2 WITH
+item3 (wc4)
+item4 (wc5);
+item3 WITH
+item4 (wc6);
+item1 (wv1)
+item2 (wv2)
+item3 (wv3)
+item4 (wv4);
+
+item1 item2 item3 item4  ON time ;
+%BETWEEN%
+item1 WITH
+item2 (bc1)
+item3 (bc2)
+item4 (bc3);
+item2 WITH
+item3 (bc4)
+item4 (bc5);
+item3 WITH
+item4 (bc6);
+item1 (bv1)
+item2 (bv2)
+item3 (bv3)
+item4 (bv4);
+
+MODEL CONSTRAINT:
+NEW (comp_v_w alpha_w comp_v_b alpha_b);
+comp_v_w = wv1+wv2+wv3+wv4+2*(wc1+wc2+wc3+wc4+wc5+wc6);
+alpha_w = (((wc1+wc2+wc3+wc4+wc5+wc6)/6)*16)/comp_v_w;
+comp_v_b = bv1+bv2+bv3+bv4+2*(bc1+bc2+bc3+bc4+bc5+bc6);
+alpha_b = (((bc1+bc2+bc3+bc4+bc5+bc6)/6)*16)/comp_v_b;
+OUTPUT:
+SAMPSTAT CINTERVAL;

@@ -1,0 +1,277 @@
+---
+title: How to compute multi-level reliability indices in R and Mplus
+author: Francisco Wilhelm
+date: '2019-05-11'
+tags:
+  - R
+  - statistics
+slug: how-to-compute-multi-level-reliability-indices-in-r-and-mplus
+#draft: false
+image:
+  caption: ''
+  focal_point: ''
+output:
+  html_document:
+    df_print: kable
+---
+
+
+
+<p>Reliability estimation is one of the core tasks when working with psychological scales. However, relability estimation with a multi-level data structure has only recently become a topic and its hard to find good materials for this. In this post, we are going to use several R packages and MPlus to compute the reliability of scales in a multi-level framework.</p>
+<div id="statistical-framework-and-indices" class="section level2">
+<h2>Statistical framework and indices</h2>
+<p>We use a multilevel confirmatory factor analysis (MCFA) to estimate the reliability of a psychological scale in a two-level framework. We are going to refer to level-1 as the within-level, and to level-2 as the between-level. The methods are described in Geldhof, Preacher, and Zyphur (2014) and Shrout and Lane (2012).</p>
+<p>There are several reliability estimates available. The most common is Cronbach’s Alpha. It can be extended to a multi-level framework. The estimate can be be computed for both the within-level and the between-level. Omega is another index that is generally considered better than Alpha, but is less common.
+When the multilevel data comes from an intensive longitudinal design, we also want to control for the (linear) time trend. This will be the case for our example.</p>
+</div>
+<div id="tools" class="section level2">
+<h2>Tools</h2>
+<p>We use Mplus to do the statistical heavy-lifting here; possibly, the R package <code>lavaan</code> could also do this, but at the time of writing, <code>lavaan</code> still misses some multilevel functionality (such as handling missing level-1 data) that make Mplus the superior tool <a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>. We will utilize the R package <code>MPlusAutomation</code> to generate the syntax code, write the “.inp” files for Mplus and analyze the results.</p>
+<pre class="r"><code>library(MplusAutomation)</code></pre>
+<pre><code>## Version:  0.7-3
+## We work hard to write this free software. Please help us get credit by citing: 
+## 
+## Hallquist, M. N. &amp; Wiley, J. F. (2018). MplusAutomation: An R Package for Facilitating Large-Scale Latent Variable Analyses in Mplus. Structural Equation Modeling, 25, 621-638. doi: 10.1080/10705511.2017.1402334.
+## 
+## -- see citation(&quot;MplusAutomation&quot;).</code></pre>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## -- Attaching packages ----------------------------------------------------------------------------------------------------------------- tidyverse 1.2.1 --</code></pre>
+<pre><code>## v ggplot2 3.2.1     v purrr   0.3.3
+## v tibble  2.1.3     v dplyr   0.8.3
+## v tidyr   1.0.0     v stringr 1.4.0
+## v readr   1.3.1     v forcats 0.4.0</code></pre>
+<pre><code>## -- Conflicts -------------------------------------------------------------------------------------------------------------------- tidyverse_conflicts() --
+## x tidyr::extract() masks MplusAutomation::extract()
+## x dplyr::filter()  masks stats::filter()
+## x dplyr::lag()     masks stats::lag()</code></pre>
+</div>
+<div id="example-dataset" class="section level2">
+<h2>Example Dataset</h2>
+<p>We use an example dataset provided by Bolger and Laurenceau (2013). You can get it from their website <a href="http://www.intensivelongitudinal.com/ch7/ch7index.html">here</a>, download and extract the ch7Mplus.zip file, the data is in the psychometrics.dat file. Because the dataset comes from an Mplus setting, we first have to modify it a little bit.</p>
+<pre class="r"><code>psychometrics &lt;- as_tibble(readr::read_tsv(&quot;multilevel/psychometrics.dat&quot;))
+names(psychometrics) &lt;- c(&quot;id&quot;, &quot;time&quot;, &quot;item1&quot;, &quot;item2&quot;, &quot;item3&quot;, &quot;item4&quot;)
+psychometrics &lt;- psychometrics %&gt;% mutate_all(~na_if(., -999))</code></pre>
+<pre class="r"><code>head(psychometrics)</code></pre>
+<pre><code>## # A tibble: 6 x 6
+##      id  time item1 item2 item3 item4
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1   301     2     2     3     3     2
+## 2   301     3     3     3     2     2
+## 3   301     4     4     3     3     3
+## 4   301     5     2     2     2     2
+## 5   301     6     2     2     1     2
+## 6   301     7     2     2     1     2</code></pre>
+<p>The data is long format, with multiple rows per person (<code>id</code> identifies the person) - one row for each <code>time</code> point, and four items belonging to the same scale measured at each time point.</p>
+<p>Next we are going to source some code I created to help us prepare the Mplus Syntax for estimating the multilevel reliabilities.</p>
+<pre class="r"><code>source(&quot;https://raw.githubusercontent.com/franciscowilhelm/r-collection/master/modelstring.R&quot;)</code></pre>
+<p>Now we use <code>MplusAutomation</code> to create the Mplus object syntax. We are going to estimate Cronbach’s <span class="math inline">\(\alpha\)</span> (alpha), <span class="math inline">\(\omega\)</span> (omega), and Maximal Reliability ( <span class="math inline">\(H\)</span> )<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>, each at the between- and the within-person level.</p>
+<pre class="r"><code># define the names of the item variables we use
+var_names &lt;- c(&quot;item1&quot;, &quot;item2&quot;, &quot;item3&quot;, &quot;item4&quot;)
+
+# generate the MplusObject(s)
+m_rel_omega &lt;- mplusObject(
+  TITLE = &quot;MCFA RELIABILITY EXAMPLE&quot;,
+  VARIABLE = &quot;CLUSTER = id; \n WITHIN = time;&quot;,
+  ANALYSIS = &quot;TYPE = TWOLEVEL&quot;,
+  MODEL = modelstring_omega_core(var_names, &quot;time&quot;),
+  MODELCONSTRAINT = modelstring_omega_constraint(var_names),
+  OUTPUT = &quot;SAMPSTAT CINTERVAL;&quot;,
+  usevariables = c(var_names, &quot;id&quot;, &quot;time&quot;),
+  rdata = psychometrics,
+  autov = FALSE
+)
+
+m_rel_alpha &lt;- mplusObject(
+  TITLE = &quot;MCFA RELIABILITY EXAMPLE&quot;,
+  VARIABLE = &quot;CLUSTER = id; \n WITHIN = time;&quot;,
+  ANALYSIS = &quot;TYPE = TWOLEVEL&quot;,
+  MODEL = modelstring_alpha_core(var_names, &quot;time&quot;),
+  MODELCONSTRAINT = modelstring_alpha_constraint(var_names),
+  OUTPUT = &quot;SAMPSTAT CINTERVAL;&quot;,
+  usevariables = c(var_names, &quot;id&quot;, &quot;time&quot;),
+  rdata = psychometrics,
+  autov = FALSE
+)</code></pre>
+<p>Note that the “MODEL” and the MODELCONSTRAINT" sections of the syntax are generated using the functions we just sourced. The function takes the names of the item variables, and because we are using a longitudinal dataset, the name of the <code>time</code> variable. If you have data where level 1 is not longitudinal (e.g., persons in teams), you can just drop this argument.</p>
+<p>Next, we write, run, and read the model.</p>
+<pre class="r"><code>m_rel_omega &lt;- mplusModeler(m_rel_omega, modelout = &quot;./multilevel/rel_omega.inp&quot;, run = FALSE)
+m_rel_alpha &lt;- mplusModeler(m_rel_alpha, modelout = &quot;./multilevel/rel_alpha.inp&quot;, run = FALSE)
+
+runModels(target = &quot;E:\\Documents\\Github\\personal-website\\content\\post\\multilevel&quot;)</code></pre>
+<pre class="r"><code>m_rel_fit &lt;- readModels(target = &quot;E:\\Documents\\Github\\personal-website\\content\\post\\multilevel&quot;)</code></pre>
+<pre><code>## Reading model:  E:\Documents\Github\personal-website\content\post\multilevel/rel_alpha.out</code></pre>
+<pre><code>## Warning in if (is.na(sampstatSubsections)) {: the condition has length &gt; 1
+## and only the first element will be used</code></pre>
+<pre><code>## Reading model:  E:\Documents\Github\personal-website\content\post\multilevel/rel_omega.out</code></pre>
+<pre><code>## Warning in if (is.na(sampstatSubsections)) {: the condition has length &gt; 1
+## and only the first element will be used</code></pre>
+<p>Finally, we have to extract the reliability point estimates and then we are done!</p>
+<pre class="r"><code>knitr::kable(paramExtract(m_rel_fit[[1]]$parameters$unstandardized, &quot;new&quot;))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="left">paramHeader</th>
+<th align="left">param</th>
+<th align="right">est</th>
+<th align="right">se</th>
+<th align="right">est_se</th>
+<th align="right">pval</th>
+<th align="left">BetweenWithin</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>29</td>
+<td align="left">New.Additional.Parameters</td>
+<td align="left">COMP_V_W</td>
+<td align="right">5.287</td>
+<td align="right">0.475</td>
+<td align="right">11.134</td>
+<td align="right">0</td>
+<td align="left">Between</td>
+</tr>
+<tr class="even">
+<td>30</td>
+<td align="left">New.Additional.Parameters</td>
+<td align="left">ALPHA_W</td>
+<td align="right">0.776</td>
+<td align="right">0.024</td>
+<td align="right">32.854</td>
+<td align="right">0</td>
+<td align="left">Between</td>
+</tr>
+<tr class="odd">
+<td>31</td>
+<td align="left">New.Additional.Parameters</td>
+<td align="left">COMP_V_B</td>
+<td align="right">6.416</td>
+<td align="right">1.223</td>
+<td align="right">5.246</td>
+<td align="right">0</td>
+<td align="left">Between</td>
+</tr>
+<tr class="even">
+<td>32</td>
+<td align="left">New.Additional.Parameters</td>
+<td align="left">ALPHA_B</td>
+<td align="right">0.884</td>
+<td align="right">0.038</td>
+<td align="right">23.396</td>
+<td align="right">0</td>
+<td align="left">Between</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>knitr::kable(paramExtract(m_rel_fit[[2]]$parameters$unstandardized, &quot;new&quot;))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="left">paramHeader</th>
+<th align="left">param</th>
+<th align="right">est</th>
+<th align="right">se</th>
+<th align="right">est_se</th>
+<th align="right">pval</th>
+<th align="left">BetweenWithin</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>27</td>
+<td align="left">New.Additional.Parameters</td>
+<td align="left">NUM_W</td>
+<td align="right">4.116</td>
+<td align="right">0.463</td>
+<td align="right">8.883</td>
+<td align="right">0</td>
+<td align="left">Between</td>
+</tr>
+<tr class="even">
+<td>28</td>
+<td align="left">New.Additional.Parameters</td>
+<td align="left">DENOM_W</td>
+<td align="right">5.289</td>
+<td align="right">0.475</td>
+<td align="right">11.127</td>
+<td align="right">0</td>
+<td align="left">Between</td>
+</tr>
+<tr class="odd">
+<td>29</td>
+<td align="left">New.Additional.Parameters</td>
+<td align="left">OMEGA_W</td>
+<td align="right">0.778</td>
+<td align="right">0.023</td>
+<td align="right">34.119</td>
+<td align="right">0</td>
+<td align="left">Between</td>
+</tr>
+<tr class="even">
+<td>30</td>
+<td align="left">New.Additional.Parameters</td>
+<td align="left">H_W</td>
+<td align="right">0.785</td>
+<td align="right">0.021</td>
+<td align="right">37.388</td>
+<td align="right">0</td>
+<td align="left">Between</td>
+</tr>
+<tr class="odd">
+<td>31</td>
+<td align="left">New.Additional.Parameters</td>
+<td align="left">NUM_B</td>
+<td align="right">5.689</td>
+<td align="right">1.264</td>
+<td align="right">4.501</td>
+<td align="right">0</td>
+<td align="left">Between</td>
+</tr>
+<tr class="even">
+<td>32</td>
+<td align="left">New.Additional.Parameters</td>
+<td align="left">DENOM_B</td>
+<td align="right">6.411</td>
+<td align="right">1.223</td>
+<td align="right">5.243</td>
+<td align="right">0</td>
+<td align="left">Between</td>
+</tr>
+<tr class="odd">
+<td>33</td>
+<td align="left">New.Additional.Parameters</td>
+<td align="left">OMEGA_B</td>
+<td align="right">0.887</td>
+<td align="right">0.036</td>
+<td align="right">24.482</td>
+<td align="right">0</td>
+<td align="left">Between</td>
+</tr>
+<tr class="even">
+<td>34</td>
+<td align="left">New.Additional.Parameters</td>
+<td align="left">H_B</td>
+<td align="right">0.931</td>
+<td align="right">0.043</td>
+<td align="right">21.576</td>
+<td align="right">0</td>
+<td align="left">Between</td>
+</tr>
+</tbody>
+</table>
+<p>In the code above we use the <code>MplusAutomation::paramExtract</code> function to get all the parameters created through Mplus model constraints by using the <code>"new"</code> argument. Note that the Alpha model gives us the Alpha at between-level (ALPHA_B) and at the within-level (ALPHA_W), whereas the Omega model gives us Omega and H at the between-level (OMEGA_B &amp; H_B) and at the within-level (OMEGA_W &amp; H_W). Please do not let your self get confused by the “BetweenWithin” column - manually created parameters in Mplus are always given as Between, even when they are not. The other parameters (NUM &amp; DENOM) are used for the calculations and can be be ignored.</p>
+<p>As we can see, the reliabilites for our four item scale are quite decent, even at the within-level with values above .70. This means that not only does the scale capture between-person differences reliably, but also within-person changes from the person’s mean level.</p>
+</div>
+<div id="sources" class="section level2">
+<h2>Sources</h2>
+<p>Geldhof, G. J., Preacher, K. J., &amp; Zyphur, M. J. (2014). Reliability estimation in a multilevel confirmatory factor analysis framework. <em>Psychological Methods</em>, 19(1), 72–91. <a href="https://doi.org/10.1037/a0032138" class="uri">https://doi.org/10.1037/a0032138</a></p>
+<p>Shrout, P. E., &amp; Lane, S. P. (2012). Psychometrics. In M. R. Mehl &amp; T. S. Conner (Eds.), <em>Handbook of research methods for studying daily life </em>(pp. 302-320). New York, NY, US: The Guilford Press.</p>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>If you do not have access to Mplus, you may want to use an ANOVA framework instead of the MCFA framework we use here. For more, see the excellent book by Bolger and Laurenceau (2013) and its [accompanying website] (<a href="http://www.intensivelongitudinal.com/index.html" class="uri">http://www.intensivelongitudinal.com/index.html</a>) which has the R code for it. Thanks to <a href="http://www.gpv.psy.unibe.ch/ueber_uns/personen/jinauen/index_ger.html">Jennifer Inauen</a> for pointing out this book to me.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>For more information see Geldhof et al. (2014).<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>

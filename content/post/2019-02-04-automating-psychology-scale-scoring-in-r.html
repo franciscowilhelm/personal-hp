@@ -1,0 +1,138 @@
+---
+title: A workflow for automating scale scoring in R
+author: Francisco Wilhelm
+date: '2019-02-04'
+slug: automating-scale-scoring-in-r
+categories: []
+tags:
+  - R
+  - statistics
+image:
+  caption: ''
+  focal_point: ''
+summary: "This post contains a workflow that vastly speeds up the process of scale scoring and computing psychometrics such as Cronbach's alpha."
+---
+
+
+
+<p>Scoring scales is easily one of the most boring and repetitive tasks in the social sciences. In this post, we are going to learn how we can largely automate the process using R. The major advantages are both convenience, time-saving, and quick retrieval of the array of useful statistics for the items and scales in a dataset.</p>
+<p>The R package <strong>psych</strong> features powerful functions for scoring survey scales. In this tutorial, we will use a wrapper for the <code>scoreItems</code> function to automate scale scoring.</p>
+<div id="data-management-naming-variables-in-a-consistent-manner" class="section level2">
+<h2>Data management: Naming variables in a consistent manner</h2>
+<p>A crucial inital step is to name the variables of a dataset consistently. This will later come in handy when we automate the scale construction, because we will construct an algorithm that looks for a certain pattern in the name of variables to identify them as items. Our goal is to create variable names that make clear that a specific item belongs to a specific scale.</p>
+<ul>
+<li>bad example: “happy”, “serene”, “calm”</li>
+<li>good example: “posaffect_1”“,”posaffect_2“,”posaffect_3"</li>
+</ul>
+<p>I recommend using the following pattern: “scalename_itemnumber”.
+For example</p>
+<ul>
+<li><code>agr_1</code> for the first item of an agreeableness scale, or</li>
+<li><code>neu_1</code> for the first item of a neuroticism scale.</li>
+</ul>
+<p>Non-scale variables should not follow the same pattern in order to make it easy for the algorithm to distinguish items we want to score from variables we dont want to score. So, its best not to use the “characters_number” pattern for any non-scale variable. For example,
+- <code>gender_1</code> should be renamed to <code>gender</code></p>
+</div>
+<div id="example-dataset" class="section level2">
+<h2>Example dataset</h2>
+<p>This is the structure of our dataset:</p>
+<pre class="r"><code>str(df)</code></pre>
+<pre><code>## Classes &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;:    2800 obs. of  28 variables:
+##  $ agr_1    : int  2 2 5 4 2 6 2 4 4 2 ...
+##  $ agr_2    : int  4 4 4 4 3 6 5 3 3 5 ...
+##  $ agr_3    : int  3 5 5 6 3 5 5 1 6 6 ...
+##  $ agr_4    : int  4 2 4 5 4 6 3 5 3 6 ...
+##  $ agr_5    : int  4 5 4 5 5 5 5 1 3 5 ...
+##  $ con_1    : int  2 5 4 4 4 6 5 3 6 6 ...
+##  $ con_2    : int  3 4 5 4 4 6 4 2 6 5 ...
+##  $ con_3    : int  3 4 4 3 5 6 4 4 3 6 ...
+##  $ con_4    : int  4 3 2 5 3 1 2 2 4 2 ...
+##  $ con_5    : int  4 4 5 5 2 3 3 4 5 1 ...
+##  $ ext_1    : int  3 1 2 5 2 2 4 3 5 2 ...
+##  $ ext_2    : int  3 1 4 3 2 1 3 6 3 2 ...
+##  $ ext_3    : int  3 6 4 4 5 6 4 4 NA 4 ...
+##  $ ext_4    : int  4 4 4 4 4 5 5 2 4 5 ...
+##  $ ext_5    : int  4 3 5 4 5 6 5 1 3 5 ...
+##  $ neu_1    : int  3 3 4 2 2 3 1 6 5 5 ...
+##  $ neu_2    : int  4 3 5 5 3 5 2 3 5 5 ...
+##  $ neu_3    : int  2 3 4 2 4 2 2 2 2 5 ...
+##  $ neu_4    : int  2 5 2 4 4 2 1 6 3 2 ...
+##  $ neu_5    : int  3 5 3 1 3 3 1 4 3 4 ...
+##  $ ope_1    : int  3 4 4 3 3 4 5 3 6 5 ...
+##  $ ope_2    : int  6 2 2 3 3 3 2 2 6 1 ...
+##  $ ope_3    : int  3 4 5 4 4 5 5 4 6 5 ...
+##  $ ope_4    : int  4 3 5 3 3 6 6 5 6 5 ...
+##  $ ope_5    : int  3 3 2 5 3 1 1 3 1 2 ...
+##  $ gender   : int  1 2 2 2 1 2 1 1 1 2 ...
+##  $ education: int  NA NA NA NA NA 3 NA 2 1 NA ...
+##  $ age      : int  16 18 17 17 17 21 18 19 19 17 ...</code></pre>
+<p>We use a redacted <code>bfi</code> dataset from <strong>psych</strong>, which consists of 25 personality self-report items taken from the International Personality Item Pool (ipip.ori.org). We have measured each of the Big Five traits with five items.</p>
+<p>Now, instead of calculating the scores of each of these five scales manually, we are going to automate the process<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>.</p>
+</div>
+<div id="extracting-all-items" class="section level2">
+<h2>Extracting all items</h2>
+<p>As you may have seen, the dataset also contains three demographic variables in addition to the scale items we want to use. Thus, we first have to select and extract all variables that are scale items from our dataset. This is where we need the unique naming structure of item-type variables, that is, variables which follow the structure <strong>scalename_itemnumber</strong>.</p>
+<pre class="r"><code>bigfiveitems &lt;- dplyr::select(df, matches(&quot;_\\d$|_\\d.$&quot;))
+names(bigfiveitems)</code></pre>
+<pre><code>##  [1] &quot;agr_1&quot; &quot;agr_2&quot; &quot;agr_3&quot; &quot;agr_4&quot; &quot;agr_5&quot; &quot;con_1&quot; &quot;con_2&quot; &quot;con_3&quot;
+##  [9] &quot;con_4&quot; &quot;con_5&quot; &quot;ext_1&quot; &quot;ext_2&quot; &quot;ext_3&quot; &quot;ext_4&quot; &quot;ext_5&quot; &quot;neu_1&quot;
+## [17] &quot;neu_2&quot; &quot;neu_3&quot; &quot;neu_4&quot; &quot;neu_5&quot; &quot;ope_1&quot; &quot;ope_2&quot; &quot;ope_3&quot; &quot;ope_4&quot;
+## [25] &quot;ope_5&quot;</code></pre>
+<p>What we make use of here is the <code>select</code> function from the <code>dplyr</code> package. It allows to select variables based upon regular expressions <a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>. Regular expressions allow us to describe patterns in strings, such as variable names here. The regular expression we use here tells the function to look for variable names that have an underdash ("_") followed by a single digit number (e.g., 1).
+Since all items follow this naming pattern, and, importantly, no non-item does, the functions quickly selects all the item variables.</p>
+<p>Next, we automatically look for the scale names:</p>
+<pre class="r"><code>scalelist &lt;- str_extract(names(bigfiveitems), &quot;\\w+(?=_)&quot;)
+scalelist &lt;- unique(scalelist)
+scalelist</code></pre>
+<pre><code>## [1] &quot;agr&quot; &quot;con&quot; &quot;ext&quot; &quot;neu&quot; &quot;ope&quot;</code></pre>
+<p>As we can see, this next bit of code extracts the names of the scales, again using a regular expression. We could also supply the scalelist manually, e.g. <code>scalelist &lt;- c("agr", "con", "ext", "neu", "ope")</code></p>
+<p>We now use the <code>scalelist</code> to tell <code>scoreItems</code> from the <strong>psych</strong> package to create scale scores for all of the scales listed in <code>scalelist</code>. This is handled via a function called <code>scoreItemsMulti</code> you can source from my github<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>.</p>
+<pre class="r"><code>source(&quot;https://github.com/franciscowilhelm/r-collection/raw/master/scoreItemsMulti.R&quot;)</code></pre>
+<pre class="r"><code>bigfivescores &lt;- scoreItemsMulti(scalelist, bigfiveitems)</code></pre>
+<p>The beauty of this function is that it takes the names of the scales and creates not only the scale scores, but also several useful statistics such as internal reliabilities, correlation matrices and others.</p>
+<p>The scores themselves are available in the <code>scores</code> sublist of the object.</p>
+<pre class="r"><code>head(bigfivescores$scores)</code></pre>
+<pre><code>##      agr con ext neu ope
+## [1,] 4.0 2.8 3.8 2.8 3.0
+## [2,] 4.2 4.0 5.0 3.8 4.0
+## [3,] 3.8 4.0 4.2 3.6 4.8
+## [4,] 4.6 3.0 3.6 2.8 3.2
+## [5,] 4.0 4.4 4.8 3.2 3.6
+## [6,] 4.6 5.6 5.6 3.0 5.0</code></pre>
+<p>Check out the documentation of the <code>psych::scoreItems</code> function for more information on what the object contains. For example, summary gives you a correlation table:</p>
+<pre class="r"><code>summary(bigfivescores)</code></pre>
+<pre><code>## Call: psych::scoreItems(keys = keys_negative, items = dataframe_exclude, 
+##     impute = &quot;none&quot;)
+## 
+## Scale intercorrelations corrected for attenuation 
+##  raw correlations below the diagonal, (standardized) alpha on the diagonal 
+##  corrected correlations above the diagonal:
+##       agr   con   ext    neu   ope
+## agr  0.70  0.36  0.63 -0.244  0.23
+## con  0.26  0.73  0.35 -0.306  0.30
+## ext  0.46  0.26  0.76 -0.285  0.32
+## neu -0.18 -0.24 -0.22  0.814 -0.12
+## ope  0.15  0.20  0.22 -0.086  0.60</code></pre>
+<p><strong>A word of caution:</strong> If your scales contain reverse-worded items, it will try to automatically detect these<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a>. However, in such cases you should proceed with caution and consider checking manually whether it got it right. You can do this by inspect the <code>$keys.list</code> element of your object.</p>
+</div>
+<div id="summary-the-workflow" class="section level2">
+<h2>Summary: The workflow</h2>
+<p>This workflow vastly speeds up the process of scale scoring and documentation of psychometrical attributes such as Cronbach’s alpha.</p>
+<p>Here is the recommended workflow in short</p>
+<ol style="list-style-type: decimal">
+<li>Name variables such that all items follow the pattern ‘scalename_itemnumber’.</li>
+<li>Optional: Make sure that no other variables follow the pattern of ‘characters_number’.</li>
+<li>Create a character vector holding all scale names either automatically or manually.</li>
+<li>Use <code>scoreItemsMulti</code> to create the scale scores and other attributes.</li>
+<li>If reverse-worded items are part of your scales, check the <code>$keys.list</code> element of your object whether the function identified these correctly.</li>
+</ol>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>with just five scales, this may seem like of over-engineering. Usually however, you will have a much larger dataset, where such an approach saves a lot of time.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>More info on regular expressions in R, especially the tidyverse packages: <a href="https://stringr.tidyverse.org/articles/regular-expressions.html" class="uri">https://stringr.tidyverse.org/articles/regular-expressions.html</a><a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>You can also find more information for the “under-the-hood” workings on my github if you are interested.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>The automatic detection of reverse-worded items is accomplished by running a PCA and reverse scoring those items that load negatively on the factor. This may not always work correctly.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>

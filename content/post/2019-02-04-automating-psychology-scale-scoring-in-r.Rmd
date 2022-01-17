@@ -1,0 +1,116 @@
+---
+title: A workflow for automating scale scoring in R
+author: Francisco Wilhelm
+date: '2019-02-04'
+slug: automating-scale-scoring-in-r
+categories: []
+tags:
+  - R
+  - statistics
+image:
+  caption: ''
+  focal_point: ''
+summary: "This post contains a workflow that vastly speeds up the process of scale scoring and computing psychometrics such as Cronbach's alpha."
+---
+
+Scoring scales is easily one of the most boring and repetitive tasks in the social sciences. In this post, we are going to learn how we can largely automate the process using R. The major advantages are both convenience, time-saving, and quick retrieval of the array of useful statistics for the items and scales in a dataset.
+
+The R package __psych__ features powerful functions for scoring survey scales. In this tutorial, we will use a wrapper for the `scoreItems` function to automate scale scoring.
+
+## Data management: Naming variables in a consistent manner
+
+A crucial inital step is to name the variables of a dataset consistently. This will later come in handy when we automate the scale construction, because we will construct an algorithm that looks for a certain pattern in the name of variables to identify them as items. Our goal is to create variable names that make clear that a specific item belongs to a specific scale.
+
+  - bad example: "happy", "serene", "calm"
+  - good example: "posaffect_1"", "posaffect_2", "posaffect_3"
+
+I recommend using the following pattern: "scalename_itemnumber". 
+For example
+
+- `agr_1` for the first item of an agreeableness scale, or
+- `neu_1` for the first item of a neuroticism scale.
+
+Non-scale variables should not follow the same pattern in order to make it easy for the algorithm to distinguish items we want to score from variables we dont want to score. So, its best not to use the "characters_number" pattern for any non-scale variable. For example,
+- `gender_1` should be renamed to `gender`
+
+
+```{r include = F}
+library(psych)
+library(tidyverse)
+library(kableExtra)
+df <- bfi
+df <- as_tibble(df)
+df <- df %>% rename(ext_1 = E1, ext_2 = E2, ext_3 = E3, ext_4 = E4, ext_5 = E5, neu_1 = N1, neu_2 = N2, 
+              neu_3 = N3, neu_4 = N4, neu_5 = N5, ope_1 = O1, ope_2 = O2, ope_3 = O3, ope_4 = O4,
+              ope_5 = O5, agr_1 = A1, agr_2 = A2, agr_3 = A3, agr_4 = A4, agr_5 = A5, con_1 = C1,
+              con_2 = C2, con_3 = C3, con_4 = C4, con_5 = C5)
+```
+## Example dataset
+
+This is the structure of our dataset:
+```{r}
+str(df)
+```
+
+We use a redacted `bfi` dataset from __psych__, which consists of 25 personality self-report items taken from the International Personality Item Pool (ipip.ori.org). We have measured each of the Big Five traits with five items.
+
+Now, instead of calculating the scores of each of these five scales manually, we are going to automate the process^[with just five scales, this may seem like of over-engineering. Usually however, you will have a much larger dataset, where such an approach saves a lot of time.].
+
+## Extracting all items
+
+As you may have seen, the dataset also contains three demographic variables in addition to the scale items we want to use. Thus, we first have to select and extract all variables that are scale items from our dataset. This is where we need the unique naming structure of item-type variables, that is, variables which follow the structure __scalename_itemnumber__.
+
+```{r}
+bigfiveitems <- dplyr::select(df, matches("_\\d$|_\\d.$"))
+names(bigfiveitems)
+```
+
+What we make use of here is the `select` function from the ``dplyr`` package. It allows to select variables based upon regular expressions ^[More info on regular expressions in R, especially the tidyverse packages: https://stringr.tidyverse.org/articles/regular-expressions.html]. Regular expressions allow us to describe patterns in strings, such as variable names here. The regular expression we use here tells the function to look for variable names that have an underdash ("_") followed by a single digit number (e.g., 1).
+Since all items follow this naming pattern, and, importantly, no non-item does, the functions quickly selects all the item variables.
+
+Next, we automatically look for the scale names:
+```{r}
+scalelist <- str_extract(names(bigfiveitems), "\\w+(?=_)")
+scalelist <- unique(scalelist)
+scalelist
+```
+As we can see, this next bit of code extracts the names of the scales, again using a regular expression. We could also supply the scalelist  manually, e.g. `scalelist <- c("agr", "con", "ext", "neu", "ope")`
+
+We now use the `scalelist` to tell `scoreItems` from the __psych__ package to create scale scores for all of the scales listed in `scalelist`. This is handled via a function called `scoreItemsMulti` you can source from my github^[You can also find more information for the "under-the-hood" workings on my github if you are interested.].
+
+```{r}
+source("https://github.com/franciscowilhelm/r-collection/raw/master/scoreItemsMulti.R")
+```
+
+```{r warning=FALSE, message = FALSE}
+bigfivescores <- scoreItemsMulti(scalelist, bigfiveitems)
+```
+
+The beauty of this function is that it takes the names of the scales and creates not only the scale scores, but also several useful statistics such as internal reliabilities, correlation matrices and others.
+
+The scores themselves are available in the `scores` sublist of the object.
+```{r}
+head(bigfivescores$scores)
+```
+
+Check out the documentation of the `psych::scoreItems` function for more information on what the object contains. For example, summary gives you a correlation table:
+```{r}
+summary(bigfivescores)
+```
+
+
+__A word of caution:__ If your scales contain reverse-worded items, it will try to automatically detect these^[The automatic detection of reverse-worded items is accomplished by running a PCA and reverse scoring those items that load negatively on the factor. This may not always work correctly.]. However, in such cases you should proceed with caution and consider checking manually whether it got it right. You can do this by inspect the `$keys.list` element of your object.
+
+
+
+## Summary: The workflow
+
+This workflow vastly speeds up the process of scale scoring and documentation of psychometrical attributes such as Cronbach's alpha.
+
+Here is the recommended workflow in short
+
+1. Name variables such that all items follow the pattern 'scalename_itemnumber'.
+2. Optional: Make sure that no other variables follow the pattern of 'characters_number'.
+3. Create a character vector holding all scale names either automatically or manually.
+4. Use `scoreItemsMulti` to create the scale scores and other attributes.
+5. If reverse-worded items are part of your scales, check the `$keys.list` element of your object whether the function identified these correctly.

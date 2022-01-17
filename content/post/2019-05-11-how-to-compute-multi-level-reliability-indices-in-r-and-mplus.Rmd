@@ -1,0 +1,117 @@
+---
+title: How to compute multi-level reliability indices in R and Mplus
+author: Francisco Wilhelm
+date: '2019-05-11'
+tags:
+  - R
+  - statistics
+slug: how-to-compute-multi-level-reliability-indices-in-r-and-mplus
+#draft: false
+image:
+  caption: ''
+  focal_point: ''
+output:
+  html_document:
+    df_print: kable
+---
+
+Reliability estimation is one of the core tasks when working with psychological scales. However, relability estimation with a multi-level data structure has only recently become a topic and its hard to find good materials for this. In this post, we are going to use several R packages and MPlus to compute the reliability of scales in a multi-level framework.
+
+## Statistical framework and indices
+We use a multilevel confirmatory factor analysis (MCFA) to estimate the reliability of a psychological scale in a two-level framework. We are going to refer to level-1 as the within-level, and to level-2 as the between-level. The methods are described in Geldhof, Preacher, and Zyphur (2014) and Shrout and Lane (2012).
+
+There are several reliability estimates available. The most common is Cronbach's Alpha. It can be extended to a multi-level framework. The estimate can be be computed for both the within-level and the between-level.  Omega is another index that is generally considered better than Alpha, but is less common.
+When the multilevel data comes from an intensive longitudinal design, we also want to control for the (linear) time trend. This will be the case for our example.
+
+## Tools
+We use Mplus to do the statistical heavy-lifting here; possibly, the R package `lavaan` could also do this, but at the time of writing, `lavaan` still misses some multilevel functionality (such as handling missing level-1 data) that make Mplus the superior tool ^[If you do not have access to Mplus, you may want to use an ANOVA framework instead of the MCFA framework we use here. For more, see the excellent book by Bolger and Laurenceau (2013) and its [accompanying website] (http://www.intensivelongitudinal.com/index.html) which has the R code for it. Thanks to [Jennifer Inauen](http://www.gpv.psy.unibe.ch/ueber_uns/personen/jinauen/index_ger.html) for pointing out this book to me.]. We will utilize the R package `MPlusAutomation` to generate the syntax code, write the ".inp" files for Mplus and analyze the results.
+
+```{r}
+library(MplusAutomation)
+library(tidyverse)
+```
+
+## Example Dataset
+
+We use an example dataset provided by Bolger and Laurenceau (2013). You can get it from their website [here](http://www.intensivelongitudinal.com/ch7/ch7index.html), download and extract the ch7Mplus.zip file, the data is in the psychometrics.dat file. Because the dataset comes from an Mplus setting, we first have to modify it a little bit.
+
+```{r message=FALSE, warning=FALSE}
+psychometrics <- as_tibble(readr::read_tsv("multilevel/psychometrics.dat"))
+names(psychometrics) <- c("id", "time", "item1", "item2", "item3", "item4")
+psychometrics <- psychometrics %>% mutate_all(~na_if(., -999))
+```
+
+
+```{r}
+head(psychometrics)
+```
+The data is long format, with multiple rows per person (`id` identifies the person) - one row for each `time` point, and four items belonging to the same scale measured at each time point.
+
+Next we are going to source some code I created to help us prepare the Mplus Syntax for estimating the multilevel reliabilities.
+```{r}
+source("https://raw.githubusercontent.com/franciscowilhelm/r-collection/master/modelstring.R")
+```
+
+Now we use `MplusAutomation` to create the Mplus object syntax. We are going to estimate Cronbach's $\alpha$ (alpha), $\omega$ (omega), and Maximal Reliability ( $H$ )^[For more information see Geldhof et al. (2014).], each at the between- and the within-person level.
+
+```{r}
+
+# define the names of the item variables we use
+var_names <- c("item1", "item2", "item3", "item4")
+
+# generate the MplusObject(s)
+m_rel_omega <- mplusObject(
+  TITLE = "MCFA RELIABILITY EXAMPLE",
+  VARIABLE = "CLUSTER = id; \n WITHIN = time;",
+  ANALYSIS = "TYPE = TWOLEVEL",
+  MODEL = modelstring_omega_core(var_names, "time"),
+  MODELCONSTRAINT = modelstring_omega_constraint(var_names),
+  OUTPUT = "SAMPSTAT CINTERVAL;",
+  usevariables = c(var_names, "id", "time"),
+  rdata = psychometrics,
+  autov = FALSE
+)
+
+m_rel_alpha <- mplusObject(
+  TITLE = "MCFA RELIABILITY EXAMPLE",
+  VARIABLE = "CLUSTER = id; \n WITHIN = time;",
+  ANALYSIS = "TYPE = TWOLEVEL",
+  MODEL = modelstring_alpha_core(var_names, "time"),
+  MODELCONSTRAINT = modelstring_alpha_constraint(var_names),
+  OUTPUT = "SAMPSTAT CINTERVAL;",
+  usevariables = c(var_names, "id", "time"),
+  rdata = psychometrics,
+  autov = FALSE
+)
+```
+
+Note that the "MODEL" and the MODELCONSTRAINT" sections of the syntax are generated using the functions we just sourced. The function takes the names of the item variables, and because we are using a longitudinal dataset, the name of the `time` variable. If you have data where level 1 is not longitudinal (e.g., persons in teams), you can just drop this argument.
+
+Next, we write, run, and read the model. 
+```{r message=FALSE, warning=FALSE, eval=FALSE}
+m_rel_omega <- mplusModeler(m_rel_omega, modelout = "./multilevel/rel_omega.inp", run = FALSE)
+m_rel_alpha <- mplusModeler(m_rel_alpha, modelout = "./multilevel/rel_alpha.inp", run = FALSE)
+
+runModels(target = "E:\\Documents\\Github\\personal-website\\content\\post\\multilevel")
+```
+
+```{r}
+m_rel_fit <- readModels(target = "E:\\Documents\\Github\\personal-website\\content\\post\\multilevel")
+```
+
+
+Finally, we have to extract the reliability point estimates and then we are done!
+
+```{r}
+knitr::kable(paramExtract(m_rel_fit[[1]]$parameters$unstandardized, "new"))
+knitr::kable(paramExtract(m_rel_fit[[2]]$parameters$unstandardized, "new"))
+```
+
+In the code above we use the `MplusAutomation::paramExtract` function to get all the parameters created through Mplus model constraints by using the `"new"` argument. Note that the Alpha model gives us the Alpha at between-level (ALPHA_B) and at the within-level (ALPHA_W), whereas the Omega model gives us Omega and H at the between-level (OMEGA_B & H_B) and at the within-level (OMEGA_W & H_W). Please do not let your self get confused by the "BetweenWithin" column - manually created parameters in Mplus are always given as Between, even when they are not. The other parameters (NUM & DENOM) are used for the calculations and can be be ignored.
+
+As we can see, the reliabilites for our four item scale are quite decent, even at the within-level with values above .70. This means that not only does the scale capture between-person differences reliably, but also within-person changes from the person's mean level.
+
+## Sources
+Geldhof, G. J., Preacher, K. J., & Zyphur, M. J. (2014). Reliability estimation in a multilevel confirmatory factor analysis framework. _Psychological Methods_, 19(1), 72–91. https://doi.org/10.1037/a0032138
+
+Shrout, P. E., & Lane, S. P. (2012). Psychometrics. In M. R. Mehl & T. S. Conner (Eds.), _Handbook of research methods for studying daily life _(pp. 302-320). New York, NY, US: The Guilford Press. 
