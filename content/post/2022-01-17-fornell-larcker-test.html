@@ -57,7 +57,7 @@ fit &lt;- cfa(HS.model, HolzingerSwineford1939)</code></pre>
 ## 1 visual textual TRUE          0.210 0.371 0.721
 ## 2 visual speed   TRUE          0.221 0.371 0.424</code></pre>
 <p>The function returns the names of the x and y constructs, whether the Fornell-Larcker criterion is met, the squared latent correlation of the x-y pair, as well as the AVE of X and Y. We can see that the Fornell-Larcker criterion is met, as the latent squared correlations are lower than the AVEs of X and Y.</p>
-<p>Some papers use a modified version of the Fornell-Larcker criterion, where only the AVE of the X construct, not the AVE of the Y construct, is compared against the latent squared correlation. We can use this version by supplying the <code>x.only == TRUE</code> argument.</p>
+<p>Some papers use a modified version of the Fornell-Larcker criterion, where only the AVE of the X construct, not the AVE of the Y construct, is compared against the latent squared correlation. We can use this version by supplying the <code>x.only = TRUE</code> argument.</p>
 <pre class="r"><code>forn_larcker_test(fit, x = c(&quot;visual&quot;), y = c(&quot;textual&quot;, &quot;speed&quot;), x.only = TRUE)</code></pre>
 <pre><code>## # A tibble: 2 x 6
 ##   x      y       criterion latcor_sq ave_x ave_y
