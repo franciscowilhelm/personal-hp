@@ -62,7 +62,7 @@ forn_larcker_test(fit, x = c("visual"), y = c("textual", "speed"))
 
 The function returns the names of the x and y constructs, whether the Fornell-Larcker criterion is met, the squared latent correlation of the x-y pair, as well as the AVE of X and Y. We can see that the Fornell-Larcker criterion is met, as the latent squared correlations are lower than the AVEs of X and Y.
 
-Some papers use a modified version of the Fornell-Larcker criterion, where only the AVE of the X construct, not the AVE of the Y construct, is compared against the latent squared correlation. We can use this version by supplying the `x.only == TRUE` argument.
+Some papers use a modified version of the Fornell-Larcker criterion, where only the AVE of the X construct, not the AVE of the Y construct, is compared against the latent squared correlation. We can use this version by supplying the `x.only = TRUE` argument.
 
 ```{r df_print = "kable"}
 forn_larcker_test(fit, x = c("visual"), y = c("textual", "speed"), x.only = TRUE)
