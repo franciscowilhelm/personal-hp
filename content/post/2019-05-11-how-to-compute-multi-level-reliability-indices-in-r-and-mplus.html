@@ -4,7 +4,9 @@ author: Francisco Wilhelm
 date: '2019-05-11'
 tags:
   - R
+  - Mplus
   - statistics
+  - psychometrics
 slug: how-to-compute-multi-level-reliability-indices-in-r-and-mplus
 #draft: false
 image:
@@ -15,6 +17,7 @@ output:
     df_print: kable
 ---
 
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
 <p>Reliability estimation is one of the core tasks when working with psychological scales. However, relability estimation with a multi-level data structure has only recently become a topic and its hard to find good materials for this. In this post, we are going to use several R packages and MPlus to compute the reliability of scales in a multi-level framework.</p>
@@ -28,19 +31,19 @@ When the multilevel data comes from an intensive longitudinal design, we also wa
 <h2>Tools</h2>
 <p>We use Mplus to do the statistical heavy-lifting here; possibly, the R package <code>lavaan</code> could also do this, but at the time of writing, <code>lavaan</code> still misses some multilevel functionality (such as handling missing level-1 data) that make Mplus the superior tool <a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>. We will utilize the R package <code>MPlusAutomation</code> to generate the syntax code, write the “.inp” files for Mplus and analyze the results.</p>
 <pre class="r"><code>library(MplusAutomation)</code></pre>
-<pre><code>## Version:  0.7-3
+<pre><code>## Version:  1.0.0
 ## We work hard to write this free software. Please help us get credit by citing: 
 ## 
 ## Hallquist, M. N. &amp; Wiley, J. F. (2018). MplusAutomation: An R Package for Facilitating Large-Scale Latent Variable Analyses in Mplus. Structural Equation Modeling, 25, 621-638. doi: 10.1080/10705511.2017.1402334.
 ## 
 ## -- see citation(&quot;MplusAutomation&quot;).</code></pre>
 <pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## -- Attaching packages ----------------------------------------------------------------------------------------------------------------- tidyverse 1.2.1 --</code></pre>
-<pre><code>## v ggplot2 3.2.1     v purrr   0.3.3
-## v tibble  2.1.3     v dplyr   0.8.3
-## v tidyr   1.0.0     v stringr 1.4.0
-## v readr   1.3.1     v forcats 0.4.0</code></pre>
-<pre><code>## -- Conflicts -------------------------------------------------------------------------------------------------------------------- tidyverse_conflicts() --
+<pre><code>## -- Attaching packages --------------------------------------- tidyverse 1.3.1 --</code></pre>
+<pre><code>## v ggplot2 3.3.5     v purrr   0.3.4
+## v tibble  3.1.6     v dplyr   1.0.7
+## v tidyr   1.1.4     v stringr 1.4.0
+## v readr   2.1.1     v forcats 0.5.1</code></pre>
+<pre><code>## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
 ## x tidyr::extract() masks MplusAutomation::extract()
 ## x dplyr::filter()  masks stats::filter()
 ## x dplyr::lag()     masks stats::lag()</code></pre>
@@ -92,25 +95,19 @@ m_rel_alpha &lt;- mplusObject(
   rdata = psychometrics,
   autov = FALSE
 )</code></pre>
-<p>Note that the “MODEL” and the MODELCONSTRAINT" sections of the syntax are generated using the functions we just sourced. The function takes the names of the item variables, and because we are using a longitudinal dataset, the name of the <code>time</code> variable. If you have data where level 1 is not longitudinal (e.g., persons in teams), you can just drop this argument.</p>
+<p>Note that the “MODEL” and the MODELCONSTRAINT” sections of the syntax are generated using the functions we just sourced. The function takes the names of the item variables, and because we are using a longitudinal dataset, the name of the <code>time</code> variable. If you have data where level 1 is not longitudinal (e.g., persons in teams), you can just drop this argument.</p>
 <p>Next, we write, run, and read the model.</p>
 <pre class="r"><code>m_rel_omega &lt;- mplusModeler(m_rel_omega, modelout = &quot;./multilevel/rel_omega.inp&quot;, run = FALSE)
 m_rel_alpha &lt;- mplusModeler(m_rel_alpha, modelout = &quot;./multilevel/rel_alpha.inp&quot;, run = FALSE)
 
-runModels(target = &quot;E:\\Documents\\Github\\personal-website\\content\\post\\multilevel&quot;)</code></pre>
-<pre class="r"><code>m_rel_fit &lt;- readModels(target = &quot;E:\\Documents\\Github\\personal-website\\content\\post\\multilevel&quot;)</code></pre>
-<pre><code>## Reading model:  E:\Documents\Github\personal-website\content\post\multilevel/rel_alpha.out</code></pre>
-<pre><code>## Warning in if (is.na(sampstatSubsections)) {: the condition has length &gt; 1
-## and only the first element will be used</code></pre>
-<pre><code>## Reading model:  E:\Documents\Github\personal-website\content\post\multilevel/rel_omega.out</code></pre>
-<pre><code>## Warning in if (is.na(sampstatSubsections)) {: the condition has length &gt; 1
-## and only the first element will be used</code></pre>
+runModels(target = &quot;multilevel&quot;)</code></pre>
+<pre class="r"><code>m_rel_fit &lt;- readModels(target = &quot;multilevel&quot;)</code></pre>
 <p>Finally, we have to extract the reliability point estimates and then we are done!</p>
 <pre class="r"><code>knitr::kable(paramExtract(m_rel_fit[[1]]$parameters$unstandardized, &quot;new&quot;))</code></pre>
 <table>
 <thead>
 <tr class="header">
-<th></th>
+<th align="left"></th>
 <th align="left">paramHeader</th>
 <th align="left">param</th>
 <th align="right">est</th>
@@ -122,7 +119,7 @@ runModels(target = &quot;E:\\Documents\\Github\\personal-website\\content\\post\
 </thead>
 <tbody>
 <tr class="odd">
-<td>29</td>
+<td align="left">29</td>
 <td align="left">New.Additional.Parameters</td>
 <td align="left">COMP_V_W</td>
 <td align="right">5.287</td>
@@ -132,7 +129,7 @@ runModels(target = &quot;E:\\Documents\\Github\\personal-website\\content\\post\
 <td align="left">Between</td>
 </tr>
 <tr class="even">
-<td>30</td>
+<td align="left">30</td>
 <td align="left">New.Additional.Parameters</td>
 <td align="left">ALPHA_W</td>
 <td align="right">0.776</td>
@@ -142,7 +139,7 @@ runModels(target = &quot;E:\\Documents\\Github\\personal-website\\content\\post\
 <td align="left">Between</td>
 </tr>
 <tr class="odd">
-<td>31</td>
+<td align="left">31</td>
 <td align="left">New.Additional.Parameters</td>
 <td align="left">COMP_V_B</td>
 <td align="right">6.416</td>
@@ -152,7 +149,7 @@ runModels(target = &quot;E:\\Documents\\Github\\personal-website\\content\\post\
 <td align="left">Between</td>
 </tr>
 <tr class="even">
-<td>32</td>
+<td align="left">32</td>
 <td align="left">New.Additional.Parameters</td>
 <td align="left">ALPHA_B</td>
 <td align="right">0.884</td>
@@ -167,7 +164,7 @@ runModels(target = &quot;E:\\Documents\\Github\\personal-website\\content\\post\
 <table>
 <thead>
 <tr class="header">
-<th></th>
+<th align="left"></th>
 <th align="left">paramHeader</th>
 <th align="left">param</th>
 <th align="right">est</th>
@@ -179,7 +176,7 @@ runModels(target = &quot;E:\\Documents\\Github\\personal-website\\content\\post\
 </thead>
 <tbody>
 <tr class="odd">
-<td>27</td>
+<td align="left">27</td>
 <td align="left">New.Additional.Parameters</td>
 <td align="left">NUM_W</td>
 <td align="right">4.116</td>
@@ -189,7 +186,7 @@ runModels(target = &quot;E:\\Documents\\Github\\personal-website\\content\\post\
 <td align="left">Between</td>
 </tr>
 <tr class="even">
-<td>28</td>
+<td align="left">28</td>
 <td align="left">New.Additional.Parameters</td>
 <td align="left">DENOM_W</td>
 <td align="right">5.289</td>
@@ -199,7 +196,7 @@ runModels(target = &quot;E:\\Documents\\Github\\personal-website\\content\\post\
 <td align="left">Between</td>
 </tr>
 <tr class="odd">
-<td>29</td>
+<td align="left">29</td>
 <td align="left">New.Additional.Parameters</td>
 <td align="left">OMEGA_W</td>
 <td align="right">0.778</td>
@@ -209,7 +206,7 @@ runModels(target = &quot;E:\\Documents\\Github\\personal-website\\content\\post\
 <td align="left">Between</td>
 </tr>
 <tr class="even">
-<td>30</td>
+<td align="left">30</td>
 <td align="left">New.Additional.Parameters</td>
 <td align="left">H_W</td>
 <td align="right">0.785</td>
@@ -219,7 +216,7 @@ runModels(target = &quot;E:\\Documents\\Github\\personal-website\\content\\post\
 <td align="left">Between</td>
 </tr>
 <tr class="odd">
-<td>31</td>
+<td align="left">31</td>
 <td align="left">New.Additional.Parameters</td>
 <td align="left">NUM_B</td>
 <td align="right">5.689</td>
@@ -229,7 +226,7 @@ runModels(target = &quot;E:\\Documents\\Github\\personal-website\\content\\post\
 <td align="left">Between</td>
 </tr>
 <tr class="even">
-<td>32</td>
+<td align="left">32</td>
 <td align="left">New.Additional.Parameters</td>
 <td align="left">DENOM_B</td>
 <td align="right">6.411</td>
@@ -239,7 +236,7 @@ runModels(target = &quot;E:\\Documents\\Github\\personal-website\\content\\post\
 <td align="left">Between</td>
 </tr>
 <tr class="odd">
-<td>33</td>
+<td align="left">33</td>
 <td align="left">New.Additional.Parameters</td>
 <td align="left">OMEGA_B</td>
 <td align="right">0.887</td>
@@ -249,7 +246,7 @@ runModels(target = &quot;E:\\Documents\\Github\\personal-website\\content\\post\
 <td align="left">Between</td>
 </tr>
 <tr class="even">
-<td>34</td>
+<td align="left">34</td>
 <td align="left">New.Additional.Parameters</td>
 <td align="left">H_B</td>
 <td align="right">0.931</td>

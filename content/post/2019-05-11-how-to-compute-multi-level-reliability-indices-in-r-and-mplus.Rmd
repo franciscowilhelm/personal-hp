@@ -4,7 +4,9 @@ author: Francisco Wilhelm
 date: '2019-05-11'
 tags:
   - R
+  - Mplus
   - statistics
+  - psychometrics
 slug: how-to-compute-multi-level-reliability-indices-in-r-and-mplus
 #draft: false
 image:
@@ -92,11 +94,11 @@ Next, we write, run, and read the model.
 m_rel_omega <- mplusModeler(m_rel_omega, modelout = "./multilevel/rel_omega.inp", run = FALSE)
 m_rel_alpha <- mplusModeler(m_rel_alpha, modelout = "./multilevel/rel_alpha.inp", run = FALSE)
 
-runModels(target = "E:\\Documents\\Github\\personal-website\\content\\post\\multilevel")
+runModels(target = "multilevel")
 ```
 
 ```{r}
-m_rel_fit <- readModels(target = "E:\\Documents\\Github\\personal-website\\content\\post\\multilevel")
+m_rel_fit <- readModels(target = "multilevel")
 ```
 
 

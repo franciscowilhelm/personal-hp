@@ -7,6 +7,7 @@ categories: []
 tags:
   - R
   - statistics
+  - psychometrics
 image:
   caption: ''
   focal_point: ''
@@ -49,7 +50,7 @@ df <- df %>% rename(ext_1 = E1, ext_2 = E2, ext_3 = E3, ext_4 = E4, ext_5 = E5, 
 
 This is the structure of our dataset:
 ```{r}
-str(df)
+head(df)
 ```
 
 We use a redacted `bfi` dataset from __psych__, which consists of 25 personality self-report items taken from the International Personality Item Pool (ipip.ori.org). We have measured each of the Big Five traits with five items.

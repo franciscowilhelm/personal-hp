@@ -1,6 +1,6 @@
-Mplus VERSION 8.3 (Mac)
+Mplus VERSION 8.5
 MUTHEN & MUTHEN
-05/21/2019  10:59 AM
+02/11/2022   9:48 AM
 
 INPUT INSTRUCTIONS
 
@@ -298,7 +298,7 @@ RMSEA (Root Mean Square Error Of Approximation)
 CFI/TLI
 
           CFI                                1.000
-          TLI                                1.047
+          TLI                                1.000
 
 Chi-Square Test of Model Fit for the Baseline Model
 
@@ -454,8 +454,8 @@ New/Additional Parameters
     H_B              0.820       0.847       0.860       0.931       1.002       1.016       1.042
 
 
-     Beginning Time:  10:59:05
-        Ending Time:  10:59:06
+     Beginning Time:  09:48:07
+        Ending Time:  09:48:08
        Elapsed Time:  00:00:01
 
 
@@ -469,4 +469,4 @@ Fax: (310) 391-8971
 Web: www.StatModel.com
 Support: Support@StatModel.com
 
-Copyright (c) 1998-2019 Muthen & Muthen
+Copyright (c) 1998-2020 Muthen & Muthen

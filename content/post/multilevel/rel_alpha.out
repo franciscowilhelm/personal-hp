@@ -1,6 +1,6 @@
-Mplus VERSION 8.3 (Mac)
+Mplus VERSION 8.5
 MUTHEN & MUTHEN
-05/21/2019  10:59 AM
+02/11/2022   9:48 AM
 
 INPUT INSTRUCTIONS
 
@@ -452,9 +452,9 @@ New/Additional Parameters
     ALPHA_B          0.787       0.810       0.822       0.884       0.946       0.958       0.981
 
 
-     Beginning Time:  10:59:05
-        Ending Time:  10:59:05
-       Elapsed Time:  00:00:00
+     Beginning Time:  09:48:06
+        Ending Time:  09:48:07
+       Elapsed Time:  00:00:01
 
 
 
@@ -467,4 +467,4 @@ Fax: (310) 391-8971
 Web: www.StatModel.com
 Support: Support@StatModel.com
 
-Copyright (c) 1998-2019 Muthen & Muthen
+Copyright (c) 1998-2020 Muthen & Muthen
