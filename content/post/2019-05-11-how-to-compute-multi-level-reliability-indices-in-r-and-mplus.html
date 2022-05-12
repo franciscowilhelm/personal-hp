@@ -17,12 +17,15 @@ output:
     df_print: kable
 ---
 
-<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
+<div id="update-2022" class="section level2">
+<h2>Update 2022</h2>
+<p>Since the time since I wrote this blog post, a package has been developed that caulcates the multi-level reliability coefficient omega within R. See the function omegaSEM from <a href="http://joshuawiley.com/multilevelTools/reference/omegaSEM.html">multilevelTools</a>.</p>
+</div>
+<div id="main-post" class="section level2">
+<h2>Main post</h2>
 <p>Reliability estimation is one of the core tasks when working with psychological scales. However, relability estimation with a multi-level data structure has only recently become a topic and its hard to find good materials for this. In this post, we are going to use several R packages and MPlus to compute the reliability of scales in a multi-level framework.</p>
-<div id="statistical-framework-and-indices" class="section level2">
-<h2>Statistical framework and indices</h2>
 <p>We use a multilevel confirmatory factor analysis (MCFA) to estimate the reliability of a psychological scale in a two-level framework. We are going to refer to level-1 as the within-level, and to level-2 as the between-level. The methods are described in Geldhof, Preacher, and Zyphur (2014) and Shrout and Lane (2012).</p>
 <p>There are several reliability estimates available. The most common is Cronbach’s Alpha. It can be extended to a multi-level framework. The estimate can be be computed for both the within-level and the between-level. Omega is another index that is generally considered better than Alpha, but is less common.
 When the multilevel data comes from an intensive longitudinal design, we also want to control for the (linear) time trend. This will be the case for our example.</p>
@@ -31,22 +34,22 @@ When the multilevel data comes from an intensive longitudinal design, we also wa
 <h2>Tools</h2>
 <p>We use Mplus to do the statistical heavy-lifting here; possibly, the R package <code>lavaan</code> could also do this, but at the time of writing, <code>lavaan</code> still misses some multilevel functionality (such as handling missing level-1 data) that make Mplus the superior tool <a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>. We will utilize the R package <code>MPlusAutomation</code> to generate the syntax code, write the “.inp” files for Mplus and analyze the results.</p>
 <pre class="r"><code>library(MplusAutomation)</code></pre>
-<pre><code>## Version:  1.0.0
+<pre><code>## Version:  1.1.0
 ## We work hard to write this free software. Please help us get credit by citing: 
 ## 
 ## Hallquist, M. N. &amp; Wiley, J. F. (2018). MplusAutomation: An R Package for Facilitating Large-Scale Latent Variable Analyses in Mplus. Structural Equation Modeling, 25, 621-638. doi: 10.1080/10705511.2017.1402334.
 ## 
 ## -- see citation(&quot;MplusAutomation&quot;).</code></pre>
 <pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## -- Attaching packages --------------------------------------- tidyverse 1.3.1 --</code></pre>
-<pre><code>## v ggplot2 3.3.5     v purrr   0.3.4
-## v tibble  3.1.6     v dplyr   1.0.7
-## v tidyr   1.1.4     v stringr 1.4.0
-## v readr   2.1.1     v forcats 0.5.1</code></pre>
-<pre><code>## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
-## x tidyr::extract() masks MplusAutomation::extract()
-## x dplyr::filter()  masks stats::filter()
-## x dplyr::lag()     masks stats::lag()</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
+<pre><code>## ✔ ggplot2 3.3.6     ✔ purrr   0.3.4
+## ✔ tibble  3.1.7     ✔ dplyr   1.0.9
+## ✔ tidyr   1.2.0     ✔ stringr 1.4.0
+## ✔ readr   2.1.2     ✔ forcats 0.5.1</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ tidyr::extract() masks MplusAutomation::extract()
+## ✖ dplyr::filter()  masks stats::filter()
+## ✖ dplyr::lag()     masks stats::lag()</code></pre>
 </div>
 <div id="example-dataset" class="section level2">
 <h2>Example Dataset</h2>
@@ -55,7 +58,7 @@ When the multilevel data comes from an intensive longitudinal design, we also wa
 names(psychometrics) &lt;- c(&quot;id&quot;, &quot;time&quot;, &quot;item1&quot;, &quot;item2&quot;, &quot;item3&quot;, &quot;item4&quot;)
 psychometrics &lt;- psychometrics %&gt;% mutate_all(~na_if(., -999))</code></pre>
 <pre class="r"><code>head(psychometrics)</code></pre>
-<pre><code>## # A tibble: 6 x 6
+<pre><code>## # A tibble: 6 × 6
 ##      id  time item1 item2 item3 item4
 ##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
 ## 1   301     2     2     3     3     2
@@ -105,6 +108,16 @@ runModels(target = &quot;multilevel&quot;)</code></pre>
 <p>Finally, we have to extract the reliability point estimates and then we are done!</p>
 <pre class="r"><code>knitr::kable(paramExtract(m_rel_fit[[1]]$parameters$unstandardized, &quot;new&quot;))</code></pre>
 <table>
+<colgroup>
+<col width="3%" />
+<col width="34%" />
+<col width="11%" />
+<col width="7%" />
+<col width="7%" />
+<col width="9%" />
+<col width="6%" />
+<col width="18%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="left"></th>
@@ -162,6 +175,16 @@ runModels(target = &quot;multilevel&quot;)</code></pre>
 </table>
 <pre class="r"><code>knitr::kable(paramExtract(m_rel_fit[[2]]$parameters$unstandardized, &quot;new&quot;))</code></pre>
 <table>
+<colgroup>
+<col width="4%" />
+<col width="34%" />
+<col width="10%" />
+<col width="8%" />
+<col width="8%" />
+<col width="9%" />
+<col width="6%" />
+<col width="18%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="left"></th>
@@ -265,7 +288,7 @@ runModels(target = &quot;multilevel&quot;)</code></pre>
 <p>Geldhof, G. J., Preacher, K. J., &amp; Zyphur, M. J. (2014). Reliability estimation in a multilevel confirmatory factor analysis framework. <em>Psychological Methods</em>, 19(1), 72–91. <a href="https://doi.org/10.1037/a0032138" class="uri">https://doi.org/10.1037/a0032138</a></p>
 <p>Shrout, P. E., &amp; Lane, S. P. (2012). Psychometrics. In M. R. Mehl &amp; T. S. Conner (Eds.), <em>Handbook of research methods for studying daily life </em>(pp. 302-320). New York, NY, US: The Guilford Press.</p>
 </div>
-<div class="footnotes">
+<div class="footnotes footnotes-end-of-document">
 <hr />
 <ol>
 <li id="fn1"><p>If you do not have access to Mplus, you may want to use an ANOVA framework instead of the MCFA framework we use here. For more, see the excellent book by Bolger and Laurenceau (2013) and its [accompanying website] (<a href="http://www.intensivelongitudinal.com/index.html" class="uri">http://www.intensivelongitudinal.com/index.html</a>) which has the R code for it. Thanks to <a href="http://www.gpv.psy.unibe.ch/ueber_uns/personen/jinauen/index_ger.html">Jennifer Inauen</a> for pointing out this book to me.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>

@@ -1,7 +1,7 @@
 ---
 title: A workflow for automating scale scoring in R
 author: Francisco Wilhelm
-date: '2019-02-04'
+date: '2022-05-12'
 slug: automating-scale-scoring-in-r
 categories: []
 tags:
@@ -89,20 +89,21 @@ bigfivescores <- scoreItemsMulti(scalelist, bigfiveitems)
 
 The beauty of this function is that it takes the names of the scales and creates not only the scale scores, but also several useful statistics such as internal reliabilities, correlation matrices and others.
 
-The scores themselves are available in the `scores` sublist of the object.
+The scores themselves are available in the `scores` element of the object.
 ```{r}
 head(bigfivescores$scores)
 ```
 
-Check out the documentation of the `psych::scoreItems` function for more information on what the object contains. For example, summary gives you a correlation table:
+The reliabilities are given in the `alpha` element of the object.
 ```{r}
-summary(bigfivescores)
+bigfivescores$alpha
 ```
 
+__A word of caution:__ If your scales contain reverse-worded items, it will try to automatically detect these^[The automatic detection of reverse-worded items is accomplished by running a PCA and reverse scoring those items that load negatively on the factor. This may not always work correctly.]. However, in such cases you should proceed with caution and consider checking manually whether it got it right. You can do this by inspect the `$negative_index` element of your object. In the example case, some items were automatically reversed. You can also overwrite the automatic scoring by manually providing keys instructions in the form of a named list, formatted like in the original scoreItems.
 
-__A word of caution:__ If your scales contain reverse-worded items, it will try to automatically detect these^[The automatic detection of reverse-worded items is accomplished by running a PCA and reverse scoring those items that load negatively on the factor. This may not always work correctly.]. However, in such cases you should proceed with caution and consider checking manually whether it got it right. You can do this by inspect the `$keys.list` element of your object.
-
-
+```{r}
+bigfivescores <- scoreItemsMulti(scalelist, bigfiveitems, manual_keys = list(con = c("con_1", "con_2", "con_3", "-con_4", "-con_5")))
+```
 
 ## Summary: The workflow
 
@@ -114,4 +115,4 @@ Here is the recommended workflow in short
 2. Optional: Make sure that no other variables follow the pattern of 'characters_number'.
 3. Create a character vector holding all scale names either automatically or manually.
 4. Use `scoreItemsMulti` to create the scale scores and other attributes.
-5. If reverse-worded items are part of your scales, check the `$keys.list` element of your object whether the function identified these correctly.
+5. If reverse-worded items are part of your scales, check the `$negative_index` element of your object whether the function identified these correctly. If not or to ensure consistency when data changes, manually specify scale keys with the `manual_keys` parameter.

@@ -17,9 +17,14 @@ output:
     df_print: kable
 ---
 
+## Update 2022
+
+Since the time since I wrote this blog post, a package has been developed that caulcates the multi-level reliability coefficient omega within R. See the function omegaSEM from [multilevelTools](http://joshuawiley.com/multilevelTools/reference/omegaSEM.html). 
+
+## Main post
+
 Reliability estimation is one of the core tasks when working with psychological scales. However, relability estimation with a multi-level data structure has only recently become a topic and its hard to find good materials for this. In this post, we are going to use several R packages and MPlus to compute the reliability of scales in a multi-level framework.
 
-## Statistical framework and indices
 We use a multilevel confirmatory factor analysis (MCFA) to estimate the reliability of a psychological scale in a two-level framework. We are going to refer to level-1 as the within-level, and to level-2 as the between-level. The methods are described in Geldhof, Preacher, and Zyphur (2014) and Shrout and Lane (2012).
 
 There are several reliability estimates available. The most common is Cronbach's Alpha. It can be extended to a multi-level framework. The estimate can be be computed for both the within-level and the between-level.  Omega is another index that is generally considered better than Alpha, but is less common.
