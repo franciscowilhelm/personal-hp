@@ -6,7 +6,7 @@ title: Francisco Wilhelm
 superuser: true
 
 # Role/position/tagline
-role: Doctoral Researcher in I/O Psychology
+role: Career Researcher
 
 # Organizations/Affiliations to show in About widget
 organizations:
@@ -25,6 +25,9 @@ interests:
 # List qualifications (such as academic degrees)
 education:
   courses:
+  - course: PhD in Organizational Psychology
+    institution: University of Bern
+    year: 2023
   - course: MSc in Psychology
     institution: Philipps-University Marburg
     year: 2018
@@ -40,9 +43,9 @@ social:
   - icon: envelope
     icon_pack: fas
     link: '#contact'  # For a direct email link, use "mailto:test@example.org".
-  - icon: twitter
-    icon_pack: fab
-    link: https://twitter.com/zootx
+  # - icon: twitter
+  #   icon_pack: fab
+  #   link: https://twitter.com/zootx
   - icon: github
     icon_pack: fab
     link: https://github.com/franciscowilhelm
@@ -61,4 +64,4 @@ email: ""
 highlight_name: true
 ---
 
-Hi! I am a doctoral researcher in the Department for Work and Organizational Psychology at the University of Bern, Switzerland. My research interests include career development and career counseling, with a focus on applying theories of motivation and self-regulation. Besides this, I develop packages for the statistical software R.
+Hi! I am a post-doc in the Department for Work and Organizational Psychology at the University of Bern, Switzerland. My research interests include career development and career counseling, with a focus on applying theories of motivation and self-regulation. Besides this, I develop packages for the statistical software R.
