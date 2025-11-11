@@ -1,0 +1,55 @@
+TITLE:
+MCFA RELIABILITY EXAMPLE
+DATA:
+FILE = "./multilevel/rel_omega_dd5537190d5a9ed7c1265aa4b4c7c7be.dat";
+ 
+VARIABLE:
+NAMES = item1 item2 item3 item4 id time; 
+ MISSING=.;
+ CLUSTER = id; 
+ WITHIN = time;
+ANALYSIS:
+TYPE = TWOLEVEL
+MODEL:
+%WITHIN%
+ite_w BY item1* (wl1)
+item2 (wl2)
+item3 (wl3)
+item4 (wl4);ite_w@1;
+
+item1 (wr1);
+item2 (wr2);
+item3 (wr3);
+item4 (wr4);
+item1 item2 item3 item4  ON time ;
+%BETWEEN%
+ite_b BY item1* (bl1)
+item2 (bl2)
+item3 (bl3)
+item4 (bl4);ite_b@1;
+
+item1 (br1);
+item2 (br2);
+item3 (br3);
+item4 (br4);
+MODEL CONSTRAINT:
+NEW (num_w denom_w omega_w h_w num_b denom_b omega_b h_b);
+num_w = (wl1+wl2+wl3+wl4)**2;
+denom_w = ((wl1+wl2+wl3+wl4)**2)+(wr1+wr2+wr3+wr4);
+omega_w = num_w/denom_w;
+h_w = 1/(1+(1/((wl1**2/wr1)+(wl2**2/wr2)+(wl3**2/wr3)+(wl4**2/wr4))));
+num_b = (bl1+bl2+bl3+bl4)**2;
+denom_b = ((bl1+bl2+bl3+bl4)**2)+(br1+br2+br3+br4);
+omega_b = num_b/denom_b;
+h_b = 1/(1+(1/((bl1**2/br1)+(bl2**2/br2)+(bl3**2/br3)+(bl4**2/br4))));
+wr1 > 0;
+wr2 > 0;
+wr3 > 0;
+wr4 > 0;
+br1 > 0;
+br2 > 0;
+br3 > 0;
+br4 > 0;
+
+OUTPUT:
+SAMPSTAT CINTERVAL;
