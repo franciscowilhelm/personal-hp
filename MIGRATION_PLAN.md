@@ -1,5 +1,29 @@
 # Hugo Blox Migration Plan
 
+## Current Status: Phases 1-4 Complete ✅
+
+**Branch**: `hugo-blox-migration`
+**Last Updated**: 2025-11-11
+
+### Completed Phases:
+- ✅ **Phase 1**: Setup new Hugo Blox Academic CV site (commit: 2e061bb)
+- ✅ **Phase 2**: Migrated author profile and homepage (commit: 2831349)
+- ✅ **Phase 3**: Migrated 7 publications + updated citations (commits: 6bfd268, 867bdf3)
+- ✅ **Phase 4**: Migrated 4 blog posts (commit: 4c520ae)
+
+### Current Site Stats:
+- **Pages**: 97
+- **Publications**: 7 (including 3 new 2025 papers)
+- **Blog Posts**: 4
+- **Build Status**: ✅ Successful, no errors
+
+### Next Steps:
+- Phase 5: Static files, additional content
+- Phase 6: Customization & styling
+- Phase 7-9: Testing, deployment
+
+---
+
 ## Strategy: New Branch Approach (Recommended)
 
 ### Why New Branch vs New Repo?
