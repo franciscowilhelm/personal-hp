@@ -13,9 +13,9 @@ marketing:
   seo:
     site_type: Person
     local_business_type: ''
-    org_name: ''
-    description: 'The highly-customizable Hugo Academic theme powered by Hugo Blox Builder. Easily create your personal academic website.'
-    twitter: 'GetResearchDev'
+    org_name: 'University of Bern'
+    description: 'Francisco Wilhelm - Career Researcher at the University of Bern. Research on career development, counseling, motivation, and self-regulation. R package developer.'
+    twitter: ''
   analytics:
     google_analytics: ''
     baidu_tongji: ''
