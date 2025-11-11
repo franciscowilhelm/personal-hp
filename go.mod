@@ -1,10 +1,10 @@
-module personal-hp
+module github.com/franciscowilhelm/personal-hp
 
-go 1.15
+go 1.19
 
 require (
-	github.com/wowchemy/wowchemy-hugo-themes/modules/wowchemy-plugin-netlify v1.0.1-0.20230520134102-1b9f1397c1f9
-	github.com/wowchemy/wowchemy-hugo-themes/modules/wowchemy-plugin-netlify-cms v1.0.1-0.20230520134102-1b9f1397c1f9
-	github.com/wowchemy/wowchemy-hugo-themes/modules/wowchemy-plugin-reveal v0.0.0-20230520134102-1b9f1397c1f9
-	github.com/wowchemy/wowchemy-hugo-themes/modules/wowchemy/v5 v5.7.1-0.20230520134102-1b9f1397c1f9
+	github.com/HugoBlox/hugo-blox-builder/modules/blox-plugin-netlify v1.1.2
+	github.com/HugoBlox/hugo-blox-builder/modules/blox-tailwind v0.10.0
 )
+
+require github.com/HugoBlox/hugo-blox-builder/modules/blox-analytics v0.2.0 // indirect
