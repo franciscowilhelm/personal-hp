@@ -194,12 +194,19 @@ quarto render content/post/2022-01-17-fornell-larcker-test.qmd
 - Update date formats
 - Check calendar integration
 
-#### 5.3 Static Files (`static/`)
+#### 5.3 Teaching Section (Future Enhancement)
+**Note:** Not in original site, but can be added later using Hugo Blox's course/teaching features:
+- Use `content/courses/` directory structure (already present in Hugo Blox)
+- Can showcase teaching materials, course syllabi, lecture notes
+- Example structure available in demo site
+- Add to navigation menu when ready
+
+#### 5.4 Static Files (`static/`)
 - Copy over any custom files
 - PDFs, images not in content folders
 - Verify paths still work
 
-#### 5.4 Data Files (`data/`)
+#### 5.5 Data Files (`data/`)
 - Copy `page_sharer.toml` (if format compatible)
 - Copy custom fonts/themes (if still needed)
 - Update paths/references
