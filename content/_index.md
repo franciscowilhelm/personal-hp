@@ -1,7 +1,7 @@
 ---
 # Leave the homepage title empty to use the site title
 title: ''
-date: 2022-10-24
+date: 2025-11-11
 type: landing
 
 design:
@@ -14,11 +14,24 @@ sections:
     content:
       # Choose a user profile to display (a folder name within `content/authors/`)
       username: admin
+      title: About Me
       text: ''
     design:
       avatar:
         size: medium
         shape: circle
+  - block: collection
+    id: publications
+    content:
+      title: Selected Publications
+      text: ''
+      filters:
+        folders:
+          - publications
+        tag: 'selected'
+        exclude_featured: false
+    design:
+      view: citation
   - block: collection
     id: posts
     content:
@@ -48,17 +61,6 @@ sections:
       # Choose a layout view
       view: article-grid
       columns: 2
-  - block: collection
-    id: publications
-    content:
-      title: Recent Publications
-      text: ''
-      filters:
-        folders:
-          - publications
-        exclude_featured: false
-    design:
-      view: citation
   - block: markdown
     id: contact
     content:

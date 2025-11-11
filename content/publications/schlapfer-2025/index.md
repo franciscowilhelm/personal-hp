@@ -23,11 +23,14 @@ abstract: "Career management skills are important in today's labour market, whic
 # Summary. An optional shortened abstract.
 summary: ""
 
-tags: []
+tags:
+  - selected
 categories: []
 featured: false
 
-links: []
+links:
+  - name: pdf
+    url: https://www.nice-network.eu/pub/
 
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.

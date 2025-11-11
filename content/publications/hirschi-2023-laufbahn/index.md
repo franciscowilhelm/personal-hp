@@ -29,7 +29,9 @@ tags: []
 categories: []
 featured: false
 
-links: []
+links:
+  - name: PDF
+    url: https://edudoc.ch/record/234685
 
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.

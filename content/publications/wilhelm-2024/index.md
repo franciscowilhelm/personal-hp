@@ -28,6 +28,7 @@ tags:
 - career proactivity
 - employability
 - proactive career behaviour
+- selected
 categories: []
 featured: false
 
@@ -35,7 +36,9 @@ hugoblox:
   ids:
     doi: 10.1111/joop.12474
 
-links: []
+links:
+  - name: pdf
+    url: https://doi.org/10.1111/joop.12474
 
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.

@@ -1,6 +1,6 @@
 # Hugo Blox Migration Plan
 
-## Current Status: Phases 1-4 Complete ✅
+## Current Status: Phases 1-6 Complete ✅
 
 **Branch**: `hugo-blox-migration`
 **Last Updated**: 2025-11-11
@@ -10,17 +10,19 @@
 - ✅ **Phase 2**: Migrated author profile and homepage (commit: 2831349)
 - ✅ **Phase 3**: Migrated 7 publications + updated citations (commits: 6bfd268, 867bdf3)
 - ✅ **Phase 4**: Migrated 4 blog posts (commit: 4c520ae)
+- ✅ **Phase 5**: Added teaching section with multilevel models course
+- ✅ **Phase 6**: Copied site icon (icon.png) from old site
 
 ### Current Site Stats:
-- **Pages**: 97
+- **Pages**: 80
 - **Publications**: 7 (including 3 new 2025 papers)
 - **Blog Posts**: 4
+- **Courses**: 1 (Multilevel Models for Diary Studies)
 - **Build Status**: ✅ Successful, no errors
 
 ### Next Steps:
-- Phase 5: Static files, additional content
-- Phase 6: Customization & styling
-- Phase 7-9: Testing, deployment
+- Phase 7: Testing & QA
+- Phase 8-9: Deployment (requires user review first)
 
 ---
 
@@ -206,56 +208,32 @@ quarto render content/post/2022-01-17-fornell-larcker-test.qmd
 
 **Checkpoint**: All blog posts accessible and readable
 
-### Phase 5: Migrate Additional Content
+### Phase 5: Migrate Additional Content ✅
 
 #### 5.1 Projects (`content/project/`)
-- Similar process to publications
-- Update frontmatter schema
-- Verify images/links
+- ✅ Skipped - only contains example content.
 
 #### 5.2 Events/Talks (`content/event/`)
-- Migrate if still relevant
-- Update date formats
-- Check calendar integration
+- ✅ Skipped - only contains example content.
 
-#### 5.3 Teaching Section (Future Enhancement)
-**Note:** Not in original site, but can be added later using Hugo Blox's course/teaching features:
-- Use `content/courses/` directory structure (already present in Hugo Blox)
-- Can showcase teaching materials, course syllabi, lecture notes
-- Example structure available in demo site
-- Add to navigation menu when ready
+#### 5.3 Teaching Section ✅
+- ✅ Created `content/courses/multilevel-models/` directory
+- ✅ Added course page with German description: "Dieses Dokument enthält Anleitungen und Übungen zur Analyse von Daten aus Tagebuchstudien mittels Mehrebenenmodellen. Es ist im Rahmen des Seminars zu Tagebuchstudien in Psychologie an der Uni Bern entstanden."
+- ✅ Included link to https://franciscowilhelm.github.io/multilevel_course/
+- ✅ Added "Teaching" link to navigation menu (weight: 35, between Publications and Contact)
+- ✅ Removed demo Hugo Blox course
+- ✅ Site builds successfully with new content
 
-#### 5.4 Static Files (`static/`)
-- Copy over any custom files
-- PDFs, images not in content folders
-- Verify paths still work
+### Phase 6: Customization & Styling ✅
 
-#### 5.5 Data Files (`data/`)
-- Copy `page_sharer.toml` (if format compatible)
-- Copy custom fonts/themes (if still needed)
-- Update paths/references
-
-### Phase 6: Customization & Styling
-
-#### 6.1 Theme Customization
-- Apply any custom CSS (if exists in old site)
-- Verify color scheme matches
-- Check font rendering
-
-#### 6.2 Assets (`assets/`)
-- Copy custom SCSS/CSS
-- Copy custom JS
-- Verify compilation
-
-#### 6.3 Custom Layouts (`layouts/`)
-- Re-implement any custom layouts
-- Update to Hugo Blox template structure
-- Test overrides work correctly
+- ✅ Copied icon.png from `_OLD_SITE_BACKUP/assets/media/icon.png` to `assets/media/icon.png`
+- Site rebuilt successfully with icon (359ms)
+- Other customizations disregarded as they may no longer be compatible with Hugo Blox 2025
 
 ### Phase 7: Testing & QA
 
 #### 7.1 Local Testing
-- [ ] Homepage loads and matches old design
+- [ ] Homepage loads and matches old layout, within the bounds of the new.
 - [ ] All publications display
 - [ ] All blog posts render
 - [ ] Navigation menu works
@@ -281,6 +259,8 @@ quarto render content/post/2022-01-17-fornell-larcker-test.qmd
 - [ ] Twitter cards
 - [ ] Sitemap generates
 - [ ] robots.txt correct
+
+Before phase 8, let user review and make further revisions before we deploy.
 
 ### Phase 8: Netlify Deployment
 

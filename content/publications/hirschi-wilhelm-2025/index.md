@@ -22,7 +22,8 @@ abstract: "In a labor market characterized by augmented dynamics and uncertainti
 # Summary. An optional shortened abstract.
 summary: ""
 
-tags: []
+tags:
+  - selected
 categories: []
 featured: true
 
@@ -30,7 +31,9 @@ hugoblox:
   ids:
     doi: 10.1177/10690727251391209
 
-links: []
+links:
+  - name: PDF + Scale
+    url: https://www.andreashirschi.org/publicationsblog/2025/11/3/career-self-management-competencies-conceptualization-and-measurement-based-on-a-career-self-regulation-framework
 
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.

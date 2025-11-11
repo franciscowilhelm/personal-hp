@@ -34,8 +34,8 @@ profiles:
     label: GitHub
 
 interests:
-  - Psychology of work and careers
-  - Future of work
+  - Psychology of Work and Careers
+  - Future of Work and Digitalization
   - R and Data Science
 
 education:

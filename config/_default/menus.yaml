@@ -11,8 +11,11 @@ main:
     url: /#posts
     weight: 20
   - name: Publications
-    url: /#publications
+    url: /publications/
     weight: 30
+  - name: Teaching
+    url: /courses/
+    weight: 35
   - name: Contact
     url: /#contact
     weight: 40
