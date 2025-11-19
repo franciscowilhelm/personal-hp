@@ -2,24 +2,18 @@
 title: How to compute multi-level reliability indices in R and Mplus
 author: Francisco Wilhelm
 date: '2019-05-11'
+format: hugo-md
 tags:
   - R
   - Mplus
   - statistics
   - psychometrics
 slug: how-to-compute-multi-level-reliability-indices-in-r-and-mplus
-#draft: false
-image:
-  caption: ''
-  focal_point: ''
-output:
-  html_document:
-    df_print: kable
 ---
 
 ## Update 2022
 
-Since the time since I wrote this blog post, a package has been developed that caulcates the multi-level reliability coefficient omega within R. See the function omegaSEM from [multilevelTools](http://joshuawiley.com/multilevelTools/reference/omegaSEM.html). 
+Since the time since I wrote this blog post, a package has been developed that caulcates the multi-level reliability coefficient omega within R. See the function omegaSEM from [multilevelTools](http://joshuawiley.com/multilevelTools/reference/omegaSEM.html).
 
 ## Main post
 
@@ -42,7 +36,9 @@ library(tidyverse)
 
 We use an example dataset provided by Bolger and Laurenceau (2013). You can get it from their website [here](http://www.intensivelongitudinal.com/ch7/ch7index.html), download and extract the ch7Mplus.zip file, the data is in the psychometrics.dat file. Because the dataset comes from an Mplus setting, we first have to modify it a little bit.
 
-```{r message=FALSE, warning=FALSE}
+```{r}
+#| message: false
+#| warning: false
 psychometrics <- as_tibble(readr::read_tsv("multilevel/psychometrics.dat"))
 names(psychometrics) <- c("id", "time", "item1", "item2", "item3", "item4")
 psychometrics <- psychometrics %>% mutate_all(~na_if(., -999))
@@ -94,8 +90,11 @@ m_rel_alpha <- mplusObject(
 
 Note that the "MODEL" and the MODELCONSTRAINT" sections of the syntax are generated using the functions we just sourced. The function takes the names of the item variables, and because we are using a longitudinal dataset, the name of the `time` variable. If you have data where level 1 is not longitudinal (e.g., persons in teams), you can just drop this argument.
 
-Next, we write, run, and read the model. 
-```{r message=FALSE, warning=FALSE, eval=FALSE}
+Next, we write, run, and read the model.
+```{r}
+#| message: false
+#| warning: false
+#| eval: false
 m_rel_omega <- mplusModeler(m_rel_omega, modelout = "./multilevel/rel_omega.inp", run = FALSE)
 m_rel_alpha <- mplusModeler(m_rel_alpha, modelout = "./multilevel/rel_alpha.inp", run = FALSE)
 
@@ -121,4 +120,4 @@ As we can see, the reliabilites for our four item scale are quite decent, even a
 ## Sources
 Geldhof, G. J., Preacher, K. J., & Zyphur, M. J. (2014). Reliability estimation in a multilevel confirmatory factor analysis framework. _Psychological Methods_, 19(1), 72–91. https://doi.org/10.1037/a0032138
 
-Shrout, P. E., & Lane, S. P. (2012). Psychometrics. In M. R. Mehl & T. S. Conner (Eds.), _Handbook of research methods for studying daily life _(pp. 302-320). New York, NY, US: The Guilford Press. 
+Shrout, P. E., & Lane, S. P. (2012). Psychometrics. In M. R. Mehl & T. S. Conner (Eds.), _Handbook of research methods for studying daily life _(pp. 302-320). New York, NY, US: The Guilford Press.

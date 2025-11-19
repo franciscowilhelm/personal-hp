@@ -1,0 +1,148 @@
+/* Custom CSS to override Hugo Blox default widths */
+/* Simplified approach that works in all browsers */
+
+/* Target only article pages (both blog and publications have article tags) */
+/* We'll use a combination of selectors to be more specific to blog content */
+
+/* Base prose width - applies to all prose content */
+article .prose {
+  max-width: 90ch !important;
+}
+
+/* Font size adjustments - applies to all prose content */
+article .prose {
+  font-size: calc(1rem - 2px) !important;
+  line-height: 1.75 !important;
+}
+
+/* On large screens (with TOC visible), make prose significantly wider */
+@media (min-width: 1280px) {
+  article .prose {
+    max-width: 90ch !important;
+  }
+
+  /* Also make the main content container wider */
+  article main.max-w-6xl {
+    max-width: 85rem !important; /* Increased from 72rem (1152px) to 85rem (1360px) */
+  }
+
+  /* Make the overall page container wider */
+  article .max-w-screen-xl {
+    max-width: 1280px !important;
+  }
+}
+
+/* On extra large screens, make it even wider */
+@media (min-width: 1536px) {
+  article .prose {
+    max-width: 85ch !important;
+  }
+
+  article main.max-w-6xl {
+    max-width: 85rem !important;
+  }
+}
+
+/* Ensure code blocks can use the full width */
+article .prose pre {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* For large prose (lg:prose-xl), also reduce by 2px */
+@media (min-width: 1024px) {
+  article .lg\:prose-xl {
+    font-size: calc(1.25rem - 2px) !important;
+    line-height: 1.8 !important;
+  }
+}
+
+/* Make code blocks even smaller (additional 1px reduction) */
+article .prose code {
+  font-size: calc(0.875em - 1px) !important;
+}
+
+article .prose pre code {
+  font-size: calc(0.875em - 1px) !important;
+}
+
+/* Reduce heading sizes to match the new base font size */
+article .prose h1 {
+  font-size: 1.875rem !important; /* Reduced from ~2.25rem */
+  line-height: 1.2 !important;
+}
+
+article .prose h2 {
+  font-size: 1.5rem !important; /* Reduced from ~1.875rem */
+  line-height: 1.3 !important;
+}
+
+article .prose h3 {
+  font-size: 1.25rem !important; /* Reduced from ~1.5rem */
+  line-height: 1.4 !important;
+}
+
+article .prose h4 {
+  font-size: 1.125rem !important; /* Reduced from ~1.25rem */
+  line-height: 1.5 !important;
+}
+
+article .prose h5 {
+  font-size: 1rem !important;
+  line-height: 1.5 !important;
+}
+
+article .prose h6 {
+  font-size: 0.875rem !important;
+  line-height: 1.5 !important;
+}
+
+/* For large screens, adjust heading sizes proportionally */
+@media (min-width: 1024px) {
+  article .lg\:prose-xl h1 {
+    font-size: 2rem !important; /* Reduced from ~2.5rem */
+    line-height: 1.2 !important;
+  }
+
+  article .lg\:prose-xl h2 {
+    font-size: 1.625rem !important; /* Reduced from ~2rem */
+    line-height: 1.3 !important;
+  }
+
+  article .lg\:prose-xl h3 {
+    font-size: 1.375rem !important; /* Reduced from ~1.625rem */
+    line-height: 1.4 !important;
+  }
+
+  article .lg\:prose-xl h4 {
+    font-size: 1.25rem !important; /* Reduced from ~1.375rem */
+    line-height: 1.5 !important;
+  }
+}
+
+/* Make the TOC slightly narrower to give more room to content */
+@media (min-width: 1280px) {
+  .hb-toc {
+    width: 14rem !important; /* Reduced from 16rem (256px) to 14rem (224px) */
+  }
+}
+
+/* Reduce spacing between homepage sections */
+.hbb-section {
+  padding-top: 1rem !important; /* Reduced from 6rem */
+  padding-bottom: 1rem !important; /* Reduced from 6rem */
+}
+
+/* Reduce spacing between section titles and content */
+.hbb-section .mt-16 {
+  margin-top: 2rem !important; /* Reduced from 4rem (mt-16) */
+}
+
+.hbb-section .sm\:mt-20 {
+  margin-top: 2rem !important; /* Reduced from 5rem (sm:mt-20) */
+}
+
+/* Reduce bottom margin on section titles */
+.hbb-section .mb-6 {
+  margin-bottom: 1rem !important; /* Reduced from 1.5rem (mb-6) */
+}

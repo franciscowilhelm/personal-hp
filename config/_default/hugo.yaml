@@ -23,14 +23,20 @@ removePathAccents: true
 
 build:
   writeStats: true
-enableGitInfo: false
+enableGitInfo: true
 summaryLength: 30
+frontmatter:
+  lastmod:
+    - :git
+    - lastmod
+    - date
+    - publishDate
 pagination:
   pagerSize: 10
 enableEmoji: true
 enableRobotsTXT: true
 footnotereturnlinkcontents: <sup>^</sup>
-ignoreFiles: [\.ipynb$, .ipynb_checkpoints$, \.Rmd$, \.Rmarkdown$, _cache$]
+ignoreFiles: [\.ipynb$, .ipynb_checkpoints$, \\.qmd$, \.Rmd$, \.Rmarkdown$, _cache$]
 disableAliases: true
 outputs:
   home: [HTML, RSS, headers, redirects, backlinks]

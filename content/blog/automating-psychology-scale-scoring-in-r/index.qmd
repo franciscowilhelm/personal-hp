@@ -1,16 +1,14 @@
 ---
 title: A workflow for automating scale scoring in R
 author: Francisco Wilhelm
-date: '2022-05-12'
+date: '2025-10-19'
+format: hugo-md
 slug: automating-scale-scoring-in-r
 categories: []
 tags:
   - R
   - statistics
   - psychometrics
-image:
-  caption: ''
-  focal_point: ''
 summary: "This post contains a workflow that vastly speeds up the process of scale scoring and computing psychometrics such as Cronbach's alpha."
 ---
 
@@ -35,13 +33,15 @@ Non-scale variables should not follow the same pattern in order to make it easy 
 - `gender_1` should be renamed to `gender`
 
 
-```{r include = F}
+```{r}
+#| include: false
 library(psych)
 library(tidyverse)
 library(kableExtra)
+library(franzpak)
 df <- bfi
 df <- as_tibble(df)
-df <- df %>% rename(ext_1 = E1, ext_2 = E2, ext_3 = E3, ext_4 = E4, ext_5 = E5, neu_1 = N1, neu_2 = N2, 
+df <- df %>% rename(ext_1 = E1, ext_2 = E2, ext_3 = E3, ext_4 = E4, ext_5 = E5, neu_1 = N1, neu_2 = N2,
               neu_3 = N3, neu_4 = N4, neu_5 = N5, ope_1 = O1, ope_2 = O2, ope_3 = O3, ope_4 = O4,
               ope_5 = O5, agr_1 = A1, agr_2 = A2, agr_3 = A3, agr_4 = A4, agr_5 = A5, con_1 = C1,
               con_2 = C2, con_3 = C3, con_4 = C4, con_5 = C5)
@@ -77,13 +77,29 @@ scalelist
 ```
 As we can see, this next bit of code extracts the names of the scales, again using a regular expression. We could also supply the scalelist  manually, e.g. `scalelist <- c("agr", "con", "ext", "neu", "ope")`
 
-We now use the `scalelist` to tell `scoreItems` from the __psych__ package to create scale scores for all of the scales listed in `scalelist`. This is handled via a function called `scoreItemsMulti` you can source from my github^[You can also find more information for the "under-the-hood" workings on my github if you are interested.].
+We now use the `scalelist` to tell `scoreItems` from the __psych__ package to create scale scores for all of the scales listed in `scalelist`. This is handled via a function called `scoreItemsMulti` from the __franzpak__ package^[The franzpak package is available on GitHub at https://github.com/franciscowilhelm/franzpak and can be installed using `remotes::install_github("franciscowilhelm/franzpak")`.].
+
+## Installing franzpak
+
+If you haven't already installed franzpak, you can do so from GitHub:
 
 ```{r}
-source("https://github.com/franciscowilhelm/r-collection/raw/master/scoreItemsMulti.R")
+#| eval: false
+# Install remotes if you don't have it
+# install.packages("remotes")
+remotes::install_github("franciscowilhelm/franzpak")
 ```
 
-```{r warning=FALSE, message = FALSE}
+Then load the package:
+
+```{r}
+#| eval: false
+library(franzpak)
+```
+
+```{r}
+#| warning: false
+#| message: false
 bigfivescores <- scoreItemsMulti(scalelist, bigfiveitems)
 ```
 
@@ -99,20 +115,48 @@ The reliabilities are given in the `alpha` element of the object.
 bigfivescores$alpha
 ```
 
-__A word of caution:__ If your scales contain reverse-worded items, it will try to automatically detect these^[The automatic detection of reverse-worded items is accomplished by running a PCA and reverse scoring those items that load negatively on the factor. This may not always work correctly.]. However, in such cases you should proceed with caution and consider checking manually whether it got it right. You can do this by inspect the `$negative_index` element of your object. In the example case, some items were automatically reversed. You can also overwrite the automatic scoring by manually providing keys instructions in the form of a named list, formatted like in the original scoreItems.
+__A word of caution:__ If your scales contain reverse-worded items, `scoreItemsMulti` will try to automatically detect these^[The automatic detection of reverse-worded items is accomplished by running a PCA and reverse scoring those items that load negatively on the factor. This may not always work correctly.]. However, in such cases you should proceed with caution and consider checking manually whether it got it right. You can do this by inspecting the `$negative_index` element of your object. In the example case, some items were automatically reversed. You can also overwrite the automatic scoring by manually providing key instructions in the form of a named list, formatted like in the original scoreItems.
 
 ```{r}
 bigfivescores <- scoreItemsMulti(scalelist, bigfiveitems, manual_keys = list(con = c("con_1", "con_2", "con_3", "-con_4", "-con_5")))
 ```
 
+## Alternative: Using scoreItemsMultiFast
+
+For larger datasets or when you don't need reliability statistics, franzpak also provides `scoreItemsMultiFast`, which is a faster alternative that uses `psych::scoreFast()` under the hood. Unlike `scoreItemsMulti`, this function:
+
+- Does **not** calculate Cronbach's alpha or perform PCA
+- Does **not** automatically detect reverse-coded items
+- Is significantly faster for large datasets
+- Is suitable for cases with few observations where PCA or reliability estimation might fail
+
+```{r}
+#| eval: false
+# Using scoreItemsMultiFast (no automatic reverse detection)
+bigfivescores_fast <- scoreItemsMultiFast(scalelist, bigfiveitems,
+                                          manual_keys = list(
+                                            con = c("con_1", "con_2", "con_3", "-con_4", "-con_5"),
+                                            ext = c("ext_1", "ext_2", "ext_3", "ext_4", "ext_5"),
+                                            neu = c("neu_1", "neu_2", "neu_3", "neu_4", "neu_5"),
+                                            ope = c("ope_1", "ope_2", "ope_3", "ope_4", "ope_5"),
+                                            agr = c("-agr_1", "agr_2", "agr_3", "agr_4", "agr_5")
+                                          ))
+```
+
+**Important:** When using `scoreItemsMultiFast` without `manual_keys`, the function will automatically find items based on naming conventions (items starting with the scale name followed by '.' or '_') but will assume **no items are reverse-coded**. If you have reverse-coded items, you must specify them using the `manual_keys` parameter.
+
 ## Summary: The workflow
 
 This workflow vastly speeds up the process of scale scoring and documentation of psychometrical attributes such as Cronbach's alpha.
 
-Here is the recommended workflow in short
+Here is the recommended workflow in short:
 
-1. Name variables such that all items follow the pattern 'scalename_itemnumber'.
-2. Optional: Make sure that no other variables follow the pattern of 'characters_number'.
-3. Create a character vector holding all scale names either automatically or manually.
-4. Use `scoreItemsMulti` to create the scale scores and other attributes.
-5. If reverse-worded items are part of your scales, check the `$negative_index` element of your object whether the function identified these correctly. If not or to ensure consistency when data changes, manually specify scale keys with the `manual_keys` parameter.
+1. Install `franzpak` from GitHub using `remotes::install_github("franciscowilhelm/franzpak")`.
+2. Name variables such that all items follow the pattern 'scalename_itemnumber' (or 'scalename.itemnumber').
+3. Optional: Make sure that no other variables follow the pattern of 'characters_number'.
+4. Create a character vector holding all scale names either automatically or manually.
+5. Choose between `scoreItemsMulti` (includes reliability statistics, automatic reverse detection) or `scoreItemsMultiFast` (faster, no automatic reverse detection).
+6. Use your chosen function to create the scale scores and other attributes.
+7. If reverse-worded items are part of your scales:
+   - For `scoreItemsMulti`: Check the `$negative_index` element of your object to verify whether the function identified these correctly. If not, or to ensure consistency when data changes, manually specify scale keys with the `manual_keys` parameter.
+   - For `scoreItemsMultiFast`: You **must** manually specify all reverse-coded items using the `manual_keys` parameter, as this function does not perform automatic detection.

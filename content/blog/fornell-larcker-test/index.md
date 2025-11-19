@@ -1,69 +1,121 @@
 ---
 title: Fornell-Larcker Criterion with R using lavaan
-authors:
-- Francisco Wilhelm
+author: Francisco Wilhelm
 date: '2022-01-17'
+format: hugo-md
 slug: fornell-larcker-test
 categories: []
 tags:
   - R
   - statistics
   - psychometrics
-lastmod: '2022-01-17T16:05:29+01:00'
-featured: false
-image:
-  caption: ''
-  focal_point: ''
-  preview_only: false
+featured: 'no'
 projects: []
 ---
 
-<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
+## Update 2025
 
-<p>The Fornell-Larcker criterion (Fornell &amp; Larcker, 1981, p. 41) is a popular technique to check the discriminant validity of constructs in structural equation models. The criterion states that the average variance extracted (AVE) of items by a construct (factor) should be larger than the squared correlation of the latent construct with the discriminant construct. This article shows how to compute the Fornell-Larcker criterion in R with <code>lavaan</code>-based SEM analyses.</p>
-<p>We use the classic dataset also used in the lavaan examples, the Holzinger and Swineford (1939) data of mental ability test scores. The factor model consists of three intercorrelated factors (visual, textual, speed), with 9 different tests making up the indicators.</p>
-<pre class="r"><code>library(tidyverse)
+The Fornell-Larcker criterion has been criticized in an influential paper on discriminant validity (Rönkko & Cho, 2022). The authors have kindly created a function to make use of their suggested procedure, available in the **semTools** package. The function is called `discriminantValidity()`.
+
+## Main Post
+
+The Fornell-Larcker criterion (Fornell & Larcker, 1981, p. 41) is a popular technique to check the discriminant validity of constructs in structural equation models. The criterion states that the average variance extracted (AVE) of items by a construct (factor) should be larger than the squared correlation of the latent construct with the discriminant construct. This article shows how to compute the Fornell-Larcker criterion in R with `lavaan`-based SEM analyses.
+
+We use the classic dataset also used in the lavaan examples, the Holzinger and Swineford (1939) data of mental ability test scores. The factor model consists of three intercorrelated factors (visual, textual, speed), with 9 different tests making up the indicators.
+
+``` r
+library(tidyverse)
 library(lavaan)
 library(semTools)
 
-HS.model &lt;- ' visual  =~ x1 + x2 + x3
+ HS.model <- ' visual  =~ x1 + x2 + x3
               textual =~ x4 + x5 + x6
               speed   =~ x7 + x8 + x9 '
-fit &lt;- cfa(HS.model, HolzingerSwineford1939)</code></pre>
-<p>The Fornell-Larcker criterion can be applied to test whether the three factors can be discriminated from each other. Let's consider the two sides of the equation that makes up the criterion: Average Variance Extracted (AVE) and the (squared) correlations of the latent constructs.</p>
-<p>AVE is the variance extracted of each indicator by its factor, as indicated by the squared standardized loadings, divided by the total variance of each indicator, averaged over all indicator that are specified to load on the factor. The package semTools provides the AVE of a lavaan model:</p>
-<pre class="r"><code>reliability(fit)</code></pre>
-<pre><code>##           visual   textual     speed
-## alpha  0.6261171 0.8827069 0.6884550
-## omega  0.6253180 0.8851754 0.6877600
-## omega2 0.6253180 0.8851754 0.6877600
-## omega3 0.6120052 0.8850608 0.6858417
-## avevar 0.3705589 0.7210163 0.4244883</code></pre>
-<p>The squared correlations of the latent constructs can be computed by extracting the correlation of the latent constructs from the fitted lavaan object and squaring them.</p>
-<pre class="r"><code>lavInspect(fit, what = "cor.lv")^2</code></pre>
-<pre><code>##         visual textul speed
-## visual  1.000
-## textual 0.210  1.000
-## speed   0.221  0.080  1.000</code></pre>
-<p>To relate the AVE to the squared correlations, I have written a function that we will load next.</p>
-<pre class="r"><code>source("https://raw.githubusercontent.com/franciscowilhelm/r-collection/master/forn_larcker_test.R")</code></pre>
-<p>Let us assume we are interested in whether the visual factor can be discriminated from the textual and speed factors according to the Fornell-Larcker criterion. We supply the fitted lavaan object, as well as x ("our" construct) and y (the constructs that we want to test against) constructs to the function.</p>
-<pre class="r"><code>forn_larcker_test(fit, x = c("visual"), y = c("textual", "speed"))</code></pre>
-<pre><code>## # A tibble: 2 x 6
-##   x      y       criterion latcor_sq ave_x ave_y
-## * &lt;chr&gt;  &lt;chr&gt;   &lt;lgl&gt;         &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-## 1 visual textual TRUE          0.210 0.371 0.721
-## 2 visual speed   TRUE          0.221 0.371 0.424</code></pre>
-<p>The function returns the names of the x and y constructs, whether the Fornell-Larcker criterion is met, the squared latent correlation of the x-y pair, as well as the AVE of X and Y. We can see that the Fornell-Larcker criterion is met, as the latent squared correlations are lower than the AVEs of X and Y.</p>
-<p>Some papers use a modified version of the Fornell-Larcker criterion, where only the AVE of the X construct, not the AVE of the Y construct, is compared against the latent squared correlation. We can use this version by supplying the <code>x.only = TRUE</code> argument.</p>
-<pre class="r"><code>forn_larcker_test(fit, x = c("visual"), y = c("textual", "speed"), x.only = TRUE)</code></pre>
-<pre><code>## # A tibble: 2 x 6
-##   x      y       criterion latcor_sq ave_x ave_y
-## * &lt;chr&gt;  &lt;chr&gt;   &lt;lgl&gt;         &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-## 1 visual textual TRUE          0.210 0.371 0.721
-## 2 visual speed   TRUE          0.221 0.371 0.424</code></pre>
-<div id="references" class="section level2">
-<h2>References</h2>
-<p>Fornell, C., &amp; Larcker, D. F. (1981). Evaluating Structural Equation Models with Unobservable Variables and Measurement Error. Journal of Marketing Research, 18(1), 39. <a href="https://doi.org/10/cwp" class="uri">https://doi.org/10/cwp</a></p>
-</div>
+fit <- cfa(HS.model, HolzingerSwineford1939)
+```
+
+The Fornell-Larcker criterion can be applied to test whether the three factors can be discriminated from each other. Let's consider the two sides of the equation that makes up the criterion: Average Variance Extracted (AVE) and the (squared) correlations of the latent constructs.
+
+AVE is the variance extracted of each indicator by its factor, as indicated by the squared standardized loadings, divided by the total variance of each indicator, averaged over all indicator that are specified to load on the factor. The package semTools provides the AVE of a lavaan model:
+
+``` r
+AVE(fit)
+```
+
+     visual textual   speed 
+      0.371   0.721   0.424 
+
+The squared correlations of the latent constructs can be computed by extracting the correlation of the latent constructs from the fitted lavaan object and squaring them.
+
+``` r
+lavInspect(fit, what = "cor.lv")^2
+```
+
+            visual textul speed
+    visual   1.000             
+    textual  0.210  1.000      
+    speed    0.221  0.080 1.000
+
+To relate the AVE to the squared correlations, I have written a function that we will load next.
+
+``` r
+source("https://raw.githubusercontent.com/franciscowilhelm/r-collection/master/forn_larcker_test.R")
+```
+
+Let us assume we are interested in whether the visual factor can be discriminated from the textual and speed factors according to the Fornell-Larcker criterion. We supply the fitted lavaan object, as well as x ("our" construct) and y (the constructs that we want to test against) constructs to the function.
+
+``` r
+forn_larcker_test(fit, x = c("visual"), y = c("textual", "speed"))
+```
+
+    Warning in semTools::reliability(lavmodel): 
+    The reliability() function was deprecated in 2022 and will cease to be included in future versions of semTools. See help('semTools-deprecated) for details.
+
+    It is replaced by the compRelSEM() function, which can estimate alpha and model-based reliability in an even wider variety of models and data types, with greater control in specifying the desired type of reliability coefficient (i.e., more explicitly choosing assumptions). 
+
+    The average variance extracted should never have been included because it is not a reliability coefficient. It is now available from the AVE() function.
+    Warning in semTools::reliability(lavmodel): 
+    The reliability() function was deprecated in 2022 and will cease to be included in future versions of semTools. See help('semTools-deprecated) for details.
+
+    It is replaced by the compRelSEM() function, which can estimate alpha and model-based reliability in an even wider variety of models and data types, with greater control in specifying the desired type of reliability coefficient (i.e., more explicitly choosing assumptions). 
+
+    The average variance extracted should never have been included because it is not a reliability coefficient. It is now available from the AVE() function.
+
+    # A tibble: 2 × 6
+      x      y       criterion latcor_sq ave_x ave_y
+    * <chr>  <chr>   <lgl>         <dbl> <dbl> <dbl>
+    1 visual textual TRUE          0.210 0.371 0.721
+    2 visual speed   TRUE          0.221 0.371 0.424
+
+The function returns the names of the x and y constructs, whether the Fornell-Larcker criterion is met, the squared latent correlation of the x-y pair, as well as the AVE of X and Y. We can see that the Fornell-Larcker criterion is met, as the latent squared correlations are lower than the AVEs of X and Y.
+
+Some papers use a modified version of the Fornell-Larcker criterion, where only the AVE of the X construct, not the AVE of the Y construct, is compared against the latent squared correlation. We can use this version by supplying the `x.only = TRUE` argument.
+
+``` r
+forn_larcker_test(fit, x = c("visual"), y = c("textual", "speed"), x.only = TRUE)
+```
+
+    Warning in semTools::reliability(lavmodel): 
+    The reliability() function was deprecated in 2022 and will cease to be included in future versions of semTools. See help('semTools-deprecated) for details.
+
+    It is replaced by the compRelSEM() function, which can estimate alpha and model-based reliability in an even wider variety of models and data types, with greater control in specifying the desired type of reliability coefficient (i.e., more explicitly choosing assumptions). 
+
+    The average variance extracted should never have been included because it is not a reliability coefficient. It is now available from the AVE() function.
+    Warning in semTools::reliability(lavmodel): 
+    The reliability() function was deprecated in 2022 and will cease to be included in future versions of semTools. See help('semTools-deprecated) for details.
+
+    It is replaced by the compRelSEM() function, which can estimate alpha and model-based reliability in an even wider variety of models and data types, with greater control in specifying the desired type of reliability coefficient (i.e., more explicitly choosing assumptions). 
+
+    The average variance extracted should never have been included because it is not a reliability coefficient. It is now available from the AVE() function.
+
+    # A tibble: 2 × 6
+      x      y       criterion latcor_sq ave_x ave_y
+    * <chr>  <chr>   <lgl>         <dbl> <dbl> <dbl>
+    1 visual textual TRUE          0.210 0.371 0.721
+    2 visual speed   TRUE          0.221 0.371 0.424
+
+## References
+
+Fornell, C., & Larcker, D. F. (1981). Evaluating Structural Equation Models with Unobservable Variables and Measurement Error. Journal of Marketing Research, 18(1), 39. https://doi.org/10/cwp
+Rönkkö, M., & Cho, E. (2022). An Updated Guideline for Assessing Discriminant Validity. Organizational Research Methods, 25(1), 6--14. https://doi.org/10.1177/1094428120968614
