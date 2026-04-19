@@ -21,7 +21,7 @@ The R package **psych** features powerful functions for scoring survey scales. I
 
 ## Data management: Naming variables in a consistent manner
 
-A crucial inital step is to name the variables of a dataset consistently. This will later come in handy when we automate the scale construction, because we will construct an algorithm that looks for a certain pattern in the name of variables to identify them as items. Our goal is to create variable names that make clear that a specific item belongs to a specific scale.
+A crucial initial step is to name the variables of a dataset consistently. This will later come in handy when we automate the scale construction, because we will construct an algorithm that looks for a certain pattern in the name of variables to identify them as items. Our goal is to create variable names that make clear that a specific item belongs to a specific scale.
 
 -   bad example: "happy", "serene", "calm"
 -   good example: "posaffect_1"","posaffect_2", "posaffect_3"
@@ -32,7 +32,7 @@ For example
 -   `agr_1` for the first item of an agreeableness scale, or
 -   `neu_1` for the first item of a neuroticism scale.
 
-Non-scale variables should not follow the same pattern in order to make it easy for the algorithm to distinguish items we want to score from variables we dont want to score. So, its best not to use the "characters_number" pattern for any non-scale variable. For example,
+Non-scale variables should not follow the same pattern in order to make it easy for the algorithm to distinguish items we want to score from variables we don't want to score. So, it's best not to use the "characters_number" pattern for any non-scale variable. For example,
 - `gender_1` should be renamed to `gender`
 
 ## Example dataset
@@ -74,7 +74,7 @@ names(bigfiveitems)
     [10] "con_5" "ext_1" "ext_2" "ext_3" "ext_4" "ext_5" "neu_1" "neu_2" "neu_3"
     [19] "neu_4" "neu_5" "ope_1" "ope_2" "ope_3" "ope_4" "ope_5"
 
-What we make use of here is the `select` function from the `dplyr` package. It allows to select variables based upon regular expressions [^2]. Regular expressions allow us to describe patterns in strings, such as variable names here. The regular expression we use here tells the function to look for variable names that have an underdash ("\_") followed by a single digit number (e.g., 1).
+What we make use of here is the `select` function from the `dplyr` package. It allows to select variables based upon regular expressions [^2]. Regular expressions allow us to describe patterns in strings, such as variable names here. The regular expression we use here tells the function to look for variable names that have an underscore ("\_") followed by a single digit number (e.g., 1).
 Since all items follow this naming pattern, and, importantly, no non-item does, the functions quickly selects all the item variables.
 
 Next, we automatically look for the scale names:

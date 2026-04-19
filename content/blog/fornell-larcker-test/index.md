@@ -69,19 +69,6 @@ Let us assume we are interested in whether the visual factor can be discriminate
 forn_larcker_test(fit, x = c("visual"), y = c("textual", "speed"))
 ```
 
-    Warning in semTools::reliability(lavmodel): 
-    The reliability() function was deprecated in 2022 and will cease to be included in future versions of semTools. See help('semTools-deprecated) for details.
-
-    It is replaced by the compRelSEM() function, which can estimate alpha and model-based reliability in an even wider variety of models and data types, with greater control in specifying the desired type of reliability coefficient (i.e., more explicitly choosing assumptions). 
-
-    The average variance extracted should never have been included because it is not a reliability coefficient. It is now available from the AVE() function.
-    Warning in semTools::reliability(lavmodel): 
-    The reliability() function was deprecated in 2022 and will cease to be included in future versions of semTools. See help('semTools-deprecated) for details.
-
-    It is replaced by the compRelSEM() function, which can estimate alpha and model-based reliability in an even wider variety of models and data types, with greater control in specifying the desired type of reliability coefficient (i.e., more explicitly choosing assumptions). 
-
-    The average variance extracted should never have been included because it is not a reliability coefficient. It is now available from the AVE() function.
-
     # A tibble: 2 × 6
       x      y       criterion latcor_sq ave_x ave_y
     * <chr>  <chr>   <lgl>         <dbl> <dbl> <dbl>
@@ -95,19 +82,6 @@ Some papers use a modified version of the Fornell-Larcker criterion, where only 
 ``` r
 forn_larcker_test(fit, x = c("visual"), y = c("textual", "speed"), x.only = TRUE)
 ```
-
-    Warning in semTools::reliability(lavmodel): 
-    The reliability() function was deprecated in 2022 and will cease to be included in future versions of semTools. See help('semTools-deprecated) for details.
-
-    It is replaced by the compRelSEM() function, which can estimate alpha and model-based reliability in an even wider variety of models and data types, with greater control in specifying the desired type of reliability coefficient (i.e., more explicitly choosing assumptions). 
-
-    The average variance extracted should never have been included because it is not a reliability coefficient. It is now available from the AVE() function.
-    Warning in semTools::reliability(lavmodel): 
-    The reliability() function was deprecated in 2022 and will cease to be included in future versions of semTools. See help('semTools-deprecated) for details.
-
-    It is replaced by the compRelSEM() function, which can estimate alpha and model-based reliability in an even wider variety of models and data types, with greater control in specifying the desired type of reliability coefficient (i.e., more explicitly choosing assumptions). 
-
-    The average variance extracted should never have been included because it is not a reliability coefficient. It is now available from the AVE() function.
 
     # A tibble: 2 × 6
       x      y       criterion latcor_sq ave_x ave_y

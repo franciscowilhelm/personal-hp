@@ -8,8 +8,8 @@ hugoblox:
     name: "Francisco Wilhelm"
     organization: "University of Bern"
     type: person
-    tagline: "Career Researcher"
-    description: "Francisco Wilhelm - Career researcher at the University of Bern. Research on career development, counseling, motivation, self-regulation, and R package development."
+    tagline: "Postdoc in work and organizational psychology"
+    description: "Francisco Wilhelm - Postdoc at the University of Bern. Research on career development, counseling, motivation, self-regulation, and R package development."
     social:
       twitter: ""
 
@@ -57,7 +57,7 @@ hugoblox:
   seo:
     type: person
     organization: "University of Bern"
-    description: "Francisco Wilhelm - Career researcher at the University of Bern. Research on career development, counseling, motivation, self-regulation, and R package development."
+    description: "Francisco Wilhelm - Postdoc at the University of Bern. Research on career development, counseling, motivation, self-regulation, and R package development."
 
   content:
     math:

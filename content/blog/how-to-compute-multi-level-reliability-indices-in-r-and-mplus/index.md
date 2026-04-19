@@ -14,15 +14,15 @@ slug: how-to-compute-multi-level-reliability-indices-in-r-and-mplus
 
 ## Update 2022
 
-Since the time since I wrote this blog post, a package has been developed that caulcates the multi-level reliability coefficient omega within R. See the function omegaSEM from [multilevelTools](http://joshuawiley.com/multilevelTools/reference/omegaSEM.html).
+Since the time since I wrote this blog post, a package has been developed that calculates the multi-level reliability coefficient omega within R. See the function omegaSEM from [multilevelTools](http://joshuawiley.com/multilevelTools/reference/omegaSEM.html).
 
 ## Main post
 
-Reliability estimation is one of the core tasks when working with psychological scales. However, relability estimation with a multi-level data structure has only recently become a topic and its hard to find good materials for this. In this post, we are going to use several R packages and MPlus to compute the reliability of scales in a multi-level framework.
+Reliability estimation is one of the core tasks when working with psychological scales. However, reliability estimation with a multi-level data structure has only recently become a topic and its hard to find good materials for this. In this post, we are going to use several R packages and MPlus to compute the reliability of scales in a multi-level framework.
 
 We use a multilevel confirmatory factor analysis (MCFA) to estimate the reliability of a psychological scale in a two-level framework. We are going to refer to level-1 as the within-level, and to level-2 as the between-level. The methods are described in Geldhof, Preacher, and Zyphur (2014) and Shrout and Lane (2012).
 
-There are several reliability estimates available. The most common is Cronbach's Alpha. It can be extended to a multi-level framework. The estimate can be be computed for both the within-level and the between-level. Omega is another index that is generally considered better than Alpha, but is less common.
+There are several reliability estimates available. The most common is Cronbach's Alpha. It can be extended to a multi-level framework. The estimate can be computed for both the within-level and the between-level. Omega is another index that is generally considered better than Alpha, but is less common.
 When the multilevel data comes from an intensive longitudinal design, we also want to control for the (linear) time trend. This will be the case for our example.
 
 ## Tools
@@ -45,11 +45,11 @@ library(tidyverse)
 ```
 
     ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-    ✔ dplyr     1.1.4     ✔ readr     2.1.5
-    ✔ forcats   1.0.0     ✔ stringr   1.6.0
-    ✔ ggplot2   3.5.2     ✔ tibble    3.3.0
-    ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-    ✔ purrr     1.2.0     
+    ✔ dplyr     1.2.0     ✔ readr     2.1.6
+    ✔ forcats   1.0.1     ✔ stringr   1.6.0
+    ✔ ggplot2   4.0.2     ✔ tibble    3.3.1
+    ✔ lubridate 1.9.4     ✔ tidyr     1.3.2
+    ✔ purrr     1.2.1     
 
     ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
     ✖ tidyr::extract() masks MplusAutomation::extract()
@@ -166,7 +166,7 @@ knitr::kable(paramExtract(m_rel_fit[[2]]$parameters$unstandardized, "new"))
 
 In the code above we use the `MplusAutomation::paramExtract` function to get all the parameters created through Mplus model constraints by using the `"new"` argument. Note that the Alpha model gives us the Alpha at between-level (ALPHA_B) and at the within-level (ALPHA_W), whereas the Omega model gives us Omega and H at the between-level (OMEGA_B & H_B) and at the within-level (OMEGA_W & H_W). Please do not let your self get confused by the "BetweenWithin" column - manually created parameters in Mplus are always given as Between, even when they are not. The other parameters (NUM & DENOM) are used for the calculations and can be be ignored.
 
-As we can see, the reliabilites for our four item scale are quite decent, even at the within-level with values above .70. This means that not only does the scale capture between-person differences reliably, but also within-person changes from the person's mean level.
+As we can see, the reliabilities for our four item scale are quite decent, even at the within-level with values above .70. This means that not only does the scale capture between-person differences reliably, but also within-person changes from the person's mean level.
 
 ## Sources
 
@@ -174,6 +174,6 @@ Geldhof, G. J., Preacher, K. J., & Zyphur, M. J. (2014). Reliability estimation 
 
 Shrout, P. E., & Lane, S. P. (2012). Psychometrics. In M. R. Mehl & T. S. Conner (Eds.), *Handbook of research methods for studying daily life *(pp. 302-320). New York, NY, US: The Guilford Press.
 
-[^1]: If you do not have access to Mplus, you may want to use an ANOVA framework instead of the MCFA framework we use here. For more, see the excellent book by Bolger and Laurenceau (2013) and its \[accompanying website\] (http://www.intensivelongitudinal.com/index.html) which has the R code for it. Thanks to [Jennifer Inauen](http://www.gpv.psy.unibe.ch/ueber_uns/personen/jinauen/index_ger.html) for pointing out this book to me.
+[^1]: If you do not have access to Mplus, you may want to use an ANOVA framework instead of the MCFA framework we use here. For more, see the excellent book by Bolger and Laurenceau (2013) and its [accompanying website](http://www.intensivelongitudinal.com/index.html) which has the R code for it. Thanks to [Jennifer Inauen](http://www.gpv.psy.unibe.ch/ueber_uns/personen/jinauen/index_ger.html) for pointing out this book to me.
 
 [^2]: For more information see Geldhof et al. (2014).

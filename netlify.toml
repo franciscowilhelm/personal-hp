@@ -23,7 +23,7 @@
 [build.environment]
   HUGO_VERSION = "0.159.2"
   GO_VERSION = "1.21.5"
-  NODE_VERSION = "22"
+  NODE_VERSION = "24"
   HUGO_ENABLEGITINFO = "true"
   HUGO_LOG_I18N_WARNINGS = "true"
   HUGO_LOG_WARNINGS = "true"
