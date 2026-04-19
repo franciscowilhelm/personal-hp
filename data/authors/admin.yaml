@@ -1,0 +1,36 @@
+schema: hugoblox/author/v1
+slug: admin
+is_owner: true
+name:
+  display: Francisco Wilhelm
+  given: Francisco
+  family: Wilhelm
+  alternate: ''
+  pronunciation: ''
+role: Career Researcher
+bio: |
+  Hi! I am a postdoc in the Department for Work and Organizational Psychology at the University of Bern, Switzerland. My research interests include career development and career counseling, with a focus on applying theories of motivation and self-regulation. Besides this, I develop packages for the statistical software R.
+affiliations:
+  - name: University of Bern
+    url: http://www.aop.psy.unibe.ch/ueber_uns/personen/fwilhelm/
+links:
+  - icon: at-symbol
+    url: /#contact
+    label: Contact Me
+  - icon: brands/github
+    url: https://github.com/franciscowilhelm
+    label: GitHub
+interests:
+  - Psychology of Work and Careers
+  - Future of Work and Digitalization
+  - R and Data Science
+education:
+  - degree: PhD in Organizational Psychology
+    institution: University of Bern
+    year: 2018-2023
+  - degree: MSc in Psychology
+    institution: Philipps-University Marburg
+    year: 2016-2018
+  - degree: BSc in Psychology
+    institution: Philipps-University Marburg
+    year: 2013-2016

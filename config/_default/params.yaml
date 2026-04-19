@@ -1,60 +1,108 @@
-# SITE SETUP
-# Guide: https://docs.hugoblox.com/tutorial/
-# Documentation: https://docs.hugoblox.com/
-# This file is formatted using YAML syntax - learn more at https://learnxinyminutes.com/docs/yaml/
+# HugoBlox configuration
+# Schema: https://docs.hugoblox.com/guides/theming/
 
-# Appearance
-appearance:
-  mode: system
-  color: indigo
+hugoblox:
+  schema: "2.0"
 
-# SEO
-marketing:
-  seo:
-    site_type: Person
-    local_business_type: ''
-    org_name: 'University of Bern'
-    description: 'Francisco Wilhelm - Career Researcher at the University of Bern. Research on career development, counseling, motivation, and self-regulation. R package developer.'
-    twitter: ''
-  analytics:
-    google_analytics: ''
-    baidu_tongji: ''
-    plausible: ''
-    fathom: ''
-    pirsch: ''
-  verification:
-    google: ''
-    baidu: ''
+  identity:
+    name: "Francisco Wilhelm"
+    organization: "University of Bern"
+    type: person
+    tagline: "Career Researcher"
+    description: "Francisco Wilhelm - Career researcher at the University of Bern. Research on career development, counseling, motivation, self-regulation, and R package development."
+    social:
+      twitter: ""
 
-# Site header
-header:
-  navbar:
+  theme:
+    mode: system
+    pack: "default"
+    colors:
+      primary: "indigo"
+
+  typography:
+    pack: "modern"
+
+  layout:
+    radius: "md"
+    spacing: "comfortable"
+    avatar_shape: circle
+
+  header:
     enable: true
-    block: 'navbar'
-    fixed_to_top: true
-    show_search: true
-    show_theme_chooser: true
-    logo:
-      text: 'Francisco Wilhelm'
+    style: navbar
+    sticky: true
+    align: center
+    search: true
+    theme_toggle: true
+    theme_picker: true
+    language_switcher: false
+    cta:
+      enable: false
+      text: ""
+      url: ""
 
-# Site footer
-footer:
+  footer:
+    style: minimal
+    language_switcher: false
+    text: ""
+
   copyright:
-    notice: '© {year} Francisco Wilhelm. This work is licensed under {license}'
+    notice: "© {year} {name}. This work is licensed under {license}"
     license:
-      enable: true
+      type: cc
       allow_derivatives: false
       share_alike: true
       allow_commercial: false
 
-# Localization
-locale:
-  date_format: 'Jan 2, 2006'
-  time_format: '3:04 PM'
+  seo:
+    type: person
+    organization: "University of Bern"
+    description: "Francisco Wilhelm - Career researcher at the University of Bern. Research on career development, counseling, motivation, self-regulation, and R package development."
 
-# Site features
-features:
-  math:
+  content:
+    math:
+      enable: true
+    toc:
+      enable: true
+    reading_time:
+      enable: true
+    citations:
+      style: apa
+
+  search:
     enable: true
-  privacy_pack:
+    suggestions: []
+    quick_actions: []
+
+  analytics:
+    google:
+      measurement_id: ""
+    google_tag_manager:
+      container_id: ""
+    plausible:
+      domain: ""
+    fathom:
+      site_id: ""
+    pirsch:
+      site_id: ""
+    clarity:
+      project_id: ""
+    baidu:
+      site_id: ""
+
+  verification:
+    google: ""
+    bing: ""
+    baidu: ""
+    yandex: ""
+    pinterest: ""
+    naver: ""
+
+  locale:
+    date_format: "Jan 2, 2006"
+    time_format: "3:04 PM"
+    address_format: en-us
+
+  privacy:
     enable: false
+    anonymize_analytics: true
