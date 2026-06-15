@@ -47,7 +47,7 @@ hugoblox:
     text: ""
 
   copyright:
-    notice: "© {year} {name}. This work is licensed under {license}"
+    notice: "© {year} Francisco Wilhelm. This work is licensed under {license} unless otherwise noted."
     license:
       type: cc
       allow_derivatives: false
