@@ -1,0 +1,13 @@
+{{- if eq .RelPermalink "/csm-scale/" -}}
+{{/* The markdown block renders body text as `lg:prose-xl` (20px) on desktop, which
+     looks oversized on this page. Step it down to prose-lg (18px). Scoped to this
+     page and the lg breakpoint, so nothing else on the site is affected. */}}
+<style>
+  @media (min-width: 1024px) {
+    .prose.lg\:prose-xl {
+      font-size: 1.125rem;
+      line-height: 1.7777778;
+    }
+  }
+</style>
+{{- end -}}
