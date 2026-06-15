@@ -39,6 +39,8 @@ hugoblox:
 links:
   - name: pdf
     url: https://doi.org/10.1111/joop.12474
+  - name: German Scale & Counsellor Materials
+    url: /csm-scale/
 
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
