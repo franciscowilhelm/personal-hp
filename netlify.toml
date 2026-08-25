@@ -57,3 +57,9 @@
   package = "netlify-plugin-hugo-cache-resources"
   [plugins.inputs]
     debug = true
+
+[[redirects]]
+  from = "/go/dgps26"
+  to = "https://docs.google.com/document/d/1LH-JIK26BMndJZbBDyEVd5DJ3jTnHSTpxg6kDGYoRYI/edit?usp=sharing"
+  status = 302
+  force = true
